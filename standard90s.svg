@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Standard radio années 90">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a221d"/>
+      <stop offset="45%" stop-color="#16181d"/>
+      <stop offset="100%" stop-color="#0d1014"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="72%" cy="28%" r="48%">
+      <stop offset="0%" stop-color="#ffefb4" stop-opacity="0.95"/>
+      <stop offset="30%" stop-color="#e6c77d" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6e4d34"/>
+      <stop offset="100%" stop-color="#34251c"/>
+    </linearGradient>
+    <linearGradient id="beige" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1e8d3"/>
+      <stop offset="100%" stop-color="#c5b79d"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#89ffc5" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#173725" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="15" stdDeviation="18" flood-color="#000" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#lamp)"/>
+  <rect x="0" y="585" width="1600" height="315" fill="url(#desk)"/>
+  <rect x="0" y="560" width="1600" height="28" fill="#241d19" opacity="0.75"/>
+  <rect x="58" y="75" width="290" height="180" rx="18" fill="#1b2128" stroke="#38424d"/>
+  <text x="92" y="116" fill="#9fb4c8" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="3">LIGNES AUDITEURS</text>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#d7dde4">
+    <text x="92" y="156">L1</text><text x="92" y="188">L2</text><text x="92" y="220">L3</text>
+    <text x="198" y="156">On Air</text><text x="198" y="188">Hold</text><text x="198" y="220">Screening</text>
+  </g>
+  <g>
+    <circle cx="162" cy="150" r="10" fill="#76ffae"/>
+    <circle cx="162" cy="182" r="10" fill="#ffd46a"/>
+    <circle cx="162" cy="214" r="10" fill="#ff6f6f"/>
+    <circle cx="270" cy="150" r="7" fill="#1b2d1f" stroke="#70f29c"/>
+    <circle cx="270" cy="182" r="7" fill="#2e2a18" stroke="#e9c45c"/>
+    <circle cx="270" cy="214" r="7" fill="#331d1d" stroke="#ef7d7d"/>
+  </g>
+  <rect x="1240" y="88" width="250" height="180" rx="14" fill="#7d6246" stroke="#a98765" opacity="0.95"/>
+  <rect x="1272" y="112" width="88" height="70" rx="4" fill="#f8f2e7"/>
+  <rect x="1380" y="112" width="76" height="92" rx="4" fill="#fff1a8"/>
+  <rect x="1278" y="193" width="150" height="44" rx="4" fill="#f1e9da"/>
+  <circle cx="1305" cy="124" r="5" fill="#e55"/>
+  <circle cx="1410" cy="124" r="5" fill="#58f"/>
+  <circle cx="1298" cy="205" r="5" fill="#3db56b"/>
+  <text x="1291" y="150" fill="#484848" font-size="18" font-family="Arial" font-weight="700">23:58</text>
+  <text x="1289" y="214" fill="#666" font-size="16" font-family="Arial">Débat euro</text>
+  <text x="1289" y="232" fill="#666" font-size="16" font-family="Arial">Ligne Manu</text>
+  <g filter="url(#shadow)">
+    <rect x="875" y="215" width="335" height="240" rx="18" fill="#d8d0bc" stroke="#aa9c84" stroke-width="4"/>
+    <rect x="905" y="247" width="274" height="178" rx="10" fill="#0b1611" stroke="#59615b"/>
+    <rect x="915" y="257" width="254" height="158" rx="6" fill="url(#screen)"/>
+    <text x="945" y="300" fill="#0c2a18" font-size="24" font-family="Courier New, monospace" font-weight="700">STANDARD 102.4</text>
+    <text x="946" y="334" fill="#114227" font-size="18" font-family="Courier New, monospace">L1  CONNECTÉE</text>
+    <text x="946" y="362" fill="#114227" font-size="18" font-family="Courier New, monospace">L2  EN ATTENTE</text>
+    <text x="946" y="390" fill="#114227" font-size="18" font-family="Courier New, monospace">L3  HORS LIGNE</text>
+    <rect x="1018" y="462" width="50" height="18" rx="7" fill="#9f9585"/>
+    <rect x="986" y="480" width="115" height="20" rx="4" fill="#a99d87"/>
+    <rect x="1000" y="500" width="86" height="50" rx="8" fill="#776c5b"/>
+  </g>
+  <rect x="365" y="612" width="290" height="188" rx="20" fill="#163749" opacity="0.65"/>
+  <g filter="url(#shadow)">
+    <rect x="365" y="405" width="345" height="210" rx="22" fill="#efe4cb" stroke="#c0b394" stroke-width="4"/>
+    <rect x="390" y="435" width="296" height="42" rx="12" fill="#d0c2a6"/>
+    <g font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#463d34" font-weight="700">
+      <text x="410" y="462">LIGNE 1</text><text x="504" y="462">LIGNE 2</text><text x="600" y="462">LIGNE 3</text>
+    </g>
+    <g>
+      <circle cx="433" cy="505" r="10" fill="#ff7373"/><circle cx="526" cy="505" r="10" fill="#76ffae"/><circle cx="620" cy="505" r="10" fill="#ffd56d"/>
+      <rect x="418" y="528" width="30" height="50" rx="8" fill="#857662"/>
+      <rect x="511" y="528" width="30" height="50" rx="8" fill="#857662"/>
+      <rect x="605" y="528" width="30" height="50" rx="8" fill="#857662"/>
+    </g>
+    <rect x="395" y="488" width="272" height="22" rx="8" fill="#f8f0dd"/>
+    <g fill="#6f6556"><circle cx="672" cy="540" r="5"/><circle cx="672" cy="556" r="5"/><circle cx="672" cy="572" r="5"/></g>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="82" y="472" width="232" height="120" rx="26" fill="url(#beige)" stroke="#b7a88f" stroke-width="4"/>
+    <rect x="106" y="490" width="94" height="34" rx="10" fill="#ddd1ba"/>
+    <rect x="210" y="490" width="80" height="34" rx="10" fill="#ddd1ba"/>
+    <rect x="126" y="527" width="140" height="16" rx="6" fill="#b7ab94"/>
+    <g fill="#8f826f">
+      <circle cx="132" cy="560" r="7"/><circle cx="154" cy="560" r="7"/><circle cx="176" cy="560" r="7"/><circle cx="198" cy="560" r="7"/><circle cx="220" cy="560" r="7"/><circle cx="242" cy="560" r="7"/>
+    </g>
+    <path d="M90 430c22-50 70-84 120-84 48 0 94 29 114 80" fill="none" stroke="#eadfc7" stroke-width="30" stroke-linecap="round"/>
+    <path d="M93 430c22-50 70-84 120-84 48 0 94 29 114 80" fill="none" stroke="#bcae91" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <path d="M314 558c48 8 76 21 91 41 20 26 11 54 31 72 14 13 30 13 46 10" fill="none" stroke="#171b1f" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 12"/>
+  <g filter="url(#shadow)">
+    <rect x="1180" y="556" width="220" height="165" rx="10" fill="#f6f1e8"/>
+    <rect x="1180" y="556" width="220" height="22" rx="10" fill="#d7d0c3"/>
+    <g stroke="#d9d9d9" stroke-width="2">
+      <line x1="1200" y1="602" x2="1384" y2="602"/>
+      <line x1="1200" y1="632" x2="1384" y2="632"/>
+      <line x1="1200" y1="662" x2="1384" y2="662"/>
+      <line x1="1200" y1="692" x2="1384" y2="692"/>
+    </g>
+    <text x="1210" y="592" fill="#565656" font-size="18" font-family="Arial" font-weight="700">Cahier du standard</text>
+    <text x="1210" y="624" fill="#747474" font-size="16" font-family="Arial">- Fun, bonsoir…</text>
+    <text x="1210" y="654" fill="#747474" font-size="16" font-family="Arial">- Sujet ?</text>
+    <text x="1210" y="684" fill="#747474" font-size="16" font-family="Arial">- Pseudo ?</text>
+  </g>
+  <g opacity="0.95">
+    <path d="M761 627c10-46 46-77 88-77 42 0 78 31 88 77" fill="none" stroke="#c9d0d8" stroke-width="12" stroke-linecap="round"/>
+    <rect x="758" y="626" width="28" height="58" rx="10" fill="#dfe5eb"/>
+    <rect x="913" y="626" width="28" height="58" rx="10" fill="#dfe5eb"/>
+    <path d="M942 660c30 11 51 31 67 57" fill="none" stroke="#dfe5eb" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="1019" cy="733" r="8" fill="#e7edf2"/>
+  </g>
+  <g opacity="0.93">
+    <rect x="805" y="610" width="240" height="88" rx="12" fill="#cbc0a8" stroke="#a8997c"/>
+    <g fill="#efe7d7">
+      <rect x="824" y="628" width="26" height="18" rx="4"/><rect x="858" y="628" width="26" height="18" rx="4"/><rect x="892" y="628" width="26" height="18" rx="4"/><rect x="926" y="628" width="26" height="18" rx="4"/><rect x="960" y="628" width="26" height="18" rx="4"/><rect x="994" y="628" width="26" height="18" rx="4"/>
+      <rect x="824" y="654" width="36" height="18" rx="4"/><rect x="868" y="654" width="26" height="18" rx="4"/><rect x="902" y="654" width="26" height="18" rx="4"/><rect x="936" y="654" width="26" height="18" rx="4"/><rect x="970" y="654" width="26" height="18" rx="4"/><rect x="1004" y="654" width="20" height="18" rx="4"/>
+    </g>
+  </g>
+</svg>

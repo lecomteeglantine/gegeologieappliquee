@@ -1,0 +1,10 @@
+Correctif v1.8
+
+- alternance entre 2 accroches de Manu selon le nombre de fois où la partie est lancée dans le navigateur ;
+- piste 1 : TEAM06, courte, "Oui, vous êtes sur Fun." ;
+- piste 2 : TEAM07, seconde variante branchée pour l’alternance ;
+- compteur de parties séparé de la sauvegarde principale ;
+- remise à zéro = nouvelle partie + alternance de la piste Manu ;
+- fond standard années 90/2000 conservé + photo de Manu conservée.
+
+Important : si tu veux remplacer la piste 2 par un extrait plus précis, il suffira d’écraser assets/audio/team/team07.mp3.

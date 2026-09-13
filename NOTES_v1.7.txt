@@ -1,0 +1,14 @@
+Correctif v1.7
+
+- photo de Manu gardée et remplacée par la version recadrée locale ;
+- nouvelle illustration du standard, avec ambiance radio années 90/2000 (poste fixe, switchboard, écran CRT, casque, cahier d'appels) ;
+- nouveau clip TEAM06 plus court : "Oui, vous êtes sur Fun." sans prénom/pseudo derrière ;
+- scène manu_intro mise à jour pour utiliser TEAM06 et le nouveau décor ;
+- scènes audition / wait reliées au nouveau visuel du standard ;
+- save key mise à jour pour éviter les caches gênants de la v1.6.
+
+Repère trouvé dans les transcriptions consultées :
+- "Bonsoir, tu veux parler de quoi ?"
+- "Oui, vous êtes sur Fun"
+
+Si tu veux, étape suivante : je te fais une v1.8 avec un autre extrait Manu encore plus proche de "Fun bonsoir" dès que tu me donnes la source audio exacte.

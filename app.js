@@ -27,6 +27,8 @@ const AUDIO = {
   TEAM02:["assets/audio/team/team02.mp3","Manu — c’est pas possible"],
   TEAM03:["assets/audio/team/team03.mp3","Phildar — faire gueuler le moustachu"],
   TEAM04:["assets/audio/team/team04.mp3","Manu — Oui, vous êtes sur Fun. Bonsoir Trevor."],
+  TEAM06:["assets/audio/team/team06.mp3","Manu — Oui, vous êtes sur Fun."],
+  TEAM07:["assets/audio/team/team07.mp3","Manu — Variante 2 du standard"],
   TEAM05:["assets/audio/team/team05.mp3","Manu — On accueille, tu le reprends…"],
   EURO01:["assets/audio/euro/euro01_faux_serieux.mp3","Extrait authentique · débat sur l’euro · faux sérieux"],
   EURO02:["assets/audio/euro/euro02_montee_tension.mp3","Extrait authentique · débat sur l’euro · montée de tension"],
@@ -39,7 +41,8 @@ if(window.EMBEDDED_AUDIO){
   });
 }
 
-const SAVE_KEY = "devenirHabituel_euro_v16";
+const SAVE_KEY = "devenirHabituel_euro_v18";
+const META_KEY = "devenirHabituel_euro_meta_v18";
 const DEFAULT = {
   scene:"intro",
   checkpoint:"intro",
@@ -95,9 +98,30 @@ function loadState(){
   }catch(e){return {...DEFAULT};}
 }
 function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));}
+function loadMeta(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(META_KEY));
+    if(saved && Number.isFinite(saved.runCount) && saved.runCount>=1) return saved;
+  }catch(e){}
+  const fresh={runCount:1};
+  localStorage.setItem(META_KEY,JSON.stringify(fresh));
+  return fresh;
+}
+function saveMeta(meta){localStorage.setItem(META_KEY,JSON.stringify(meta));}
+function incrementRunCount(){
+  const meta=loadMeta();
+  meta.runCount=(meta.runCount||1)+1;
+  saveMeta(meta);
+  return meta.runCount;
+}
+function currentRunCount(){return loadMeta().runCount||1;}
+function currentManuIntroAudio(){return currentRunCount()%2===1?"TEAM06":"TEAM07";}
+function currentManuIntroLine(){return currentRunCount()%2===1?"Oui, vous êtes sur Fun.":"Bonsoir, tu veux parler de quoi ?";}
+function currentManuIntroLabel(){return currentRunCount()%2===1?"▶ ÉCOUTER MANU : « OUI, VOUS ÊTES SUR FUN »":"▶ ÉCOUTER MANU : « BONSOIR, TU VEUX PARLER DE QUOI ? »";}
 function resetState(){
-  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15"].forEach(k=>localStorage.removeItem(k));
-  state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast("Progression remise à zéro.");
+  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17"].forEach(k=>localStorage.removeItem(k));
+  incrementRunCount();
+  state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast(`Progression remise à zéro. Piste Manu n°${currentRunCount()%2===1?1:2} pour cette partie.`);
 }
 function setScene(scene, checkpoint){state.scene=scene;if(checkpoint)state.checkpoint=checkpoint;save();render();}
 function clamp(){state.standard=Math.max(0,Math.min(100,state.standard));state.fun=Math.max(0,Math.min(100,state.fun));state.reputation=Math.max(0,Math.min(100,state.reputation));state.gege=Math.max(0,Math.min(100,state.gege));state.grille=Math.max(0,Math.min(100,state.grille));}
@@ -264,16 +288,16 @@ function updateVisual(){
 }
 
 function sceneArtFor(scene){
-  const standard="assets/images/standard.svg";
+  const standard="assets/images/standard90s.svg";
   const manu="assets/images/manu.png";
   if(["intro","busy1","busy2","callback"].includes(scene))return [{src:"assets/images/bedroom.svg",caption:"Ton téléphone · jeudi soir",kind:"vector"}];
   if(scene==="manu_intro")return [
-    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"},
-    {src:standard,caption:"LE STANDARD · LIGNES AUDITEURS",kind:"vector"}
+    {src:standard,caption:"STANDARD RADIO · ANNÉES 90/2000",kind:"standard-room vector"},
+    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"}
   ];
   if(["audition","wait"].includes(scene))return [
-    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"},
-    {src:standard,caption:"LE STANDARD · TU ES EN ATTENTE",kind:"vector"}
+    {src:standard,caption:"STANDARD RADIO · LIGNE EN ATTENTE",kind:"standard-room vector"},
+    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"}
   ];
   if(scene==="pseudo")return [{src:"assets/images/pseudo.svg",caption:"LE CAHIER DU STANDARD · TROUVE TON BLAZE",kind:"vector"}];
   if(scene==="offair")return [
@@ -317,13 +341,13 @@ const scenes={
   intro(){state.clock="23:56";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">AUDIO · LES ARCHIVES SE LANCENT AVEC ▶</div>${btn("☎ APPELER LE STANDARD",async()=>{await playSfx("click");setScene("busy1","intro");})}</div>`;},
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   busy2(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 02</div><h2>Toujours occupé.</h2><p class="muted">Tu raccroches. Tu recomposes.</p>${btn("RAPPELER",async()=>{await playSfx("ring");await playSfx("click");setScene("manu_intro");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
-  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">MANU · STANDARD AUTHENTIQUE</div><h2>Manu te prend au standard.</h2><p>Cette archive contient le passage : <strong>« Oui, vous êtes sur Fun. Bonsoir Trevor. »</strong></p><div id="manuGate"></div><div class="native-player-card"><span>OU LECTEUR DIRECT</span><audio id="manuNative" controls preload="metadata" playsinline src="${AUDIO.TEAM04[0]}"></audio></div>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
+  manu_intro(){state.clock="23:58";save();updateHUD();const manuIntroAudio=currentManuIntroAudio();const manuIntroLine=currentManuIntroLine();const manuIntroLabel=currentManuIntroLabel();const manuVariant=currentRunCount()%2===1?1:2;el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">MANU · ARCHIVE AUTHENTIQUE · PISTE ${manuVariant}/2</div><h2>Manu te prend au standard.</h2><p>Le jeu alterne maintenant entre deux accroches de standard selon le nombre de fois où l’on relance la partie.</p><p><strong>Accroche utilisée pour cette partie :</strong> « ${manuIntroLine} »</p><p class="muted">Et visuellement, tu arrives maintenant dans un vrai standard radio de nuit : téléphone fixe, casque, CRT, cahier d’appels.</p><div id="manuGate"></div><div class="native-player-card"><span>OU LECTEUR DIRECT</span><audio id="manuNative" controls preload="metadata" playsinline src="${AUDIO[manuIntroAudio][0]}"></audio></div>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
     const host=document.getElementById("manuGate");
-    host.appendChild(audioGate("TEAM04","▶ ÉCOUTER MANU : « VOUS ÊTES SUR FUN »"));
+    host.appendChild(audioGate(manuIntroAudio,manuIntroLabel));
     bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
   },
   audition(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">AUDITION DU STANDARD</div>${dialogue("MANU","Pourquoi je te passe ?","manu")}<div class="choices">${choice("A","Parce que Gérard est nul.")}${choice("B","J’ai vraiment un avis sur l’euro.")}${choice("C","Je voulais savoir si les billets de Monopoly allaient aussi passer à l’euro.")}${choice("D","Passe-moi et tu verras.")}</div></div>`;
-    bindChoices({A:async()=>{apply({standard:-7});await playSound("TEAM02");gerbe({reason:"Le standard cherchait quelqu’un capable de jouer, pas seulement d’insulter.",resume:"manu_intro"});},B:()=>{apply({standard:3,fun:-1});setScene("pseudo","pseudo");},C:async()=>{apply({standard:10,fun:7});await playSound("TEAM04");toast("Manu a ri.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-3});if(state.standard<25){await playSound("TEAM02");gerbe({reason:"Tu as joué au mystérieux un peu trop tôt.",resume:"manu_intro"});}else setScene("pseudo","pseudo");}});
+    bindChoices({A:async()=>{apply({standard:-7});await playSound("TEAM02");gerbe({reason:"Le standard cherchait quelqu’un capable de jouer, pas seulement d’insulter.",resume:"manu_intro"});},B:()=>{apply({standard:3,fun:-1});setScene("pseudo","pseudo");},C:async()=>{apply({standard:10,fun:7});await playSound(currentManuIntroAudio());toast("Manu a relancé la ligne.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-3});if(state.standard<25){await playSound("TEAM02");gerbe({reason:"Tu as joué au mystérieux un peu trop tôt.",resume:"manu_intro"});}else setScene("pseudo","pseudo");}});
   },
   pseudo(){
     const firsts=["Alex","Jean","Guy","Aude","Marc","Paul"], seconds=["Térieur","Bon","Don","Iteur","Assin","Émique"];

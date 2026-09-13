@@ -1,4 +1,4 @@
-AUDIT v1.6
+AUDIT v1.8
 
 - JavaScript app.js : syntaxe vérifiée.
 - audio-data.js : syntaxe vérifiée.
@@ -7,4 +7,4 @@ AUDIT v1.6
 - TEAM05 : 5,538 s.
 - photo de Manu conservée localement : assets/images/manu.png.
 - aucune dépendance au fichier Lady Di complet après build : seul l'extrait nécessaire est embarqué.
-- nouvelle clé de sauvegarde v1.6 pour éviter la reprise d'un état ancien.
+- nouvelle clé de sauvegarde v1.8 pour éviter la reprise d'un état ancien.
