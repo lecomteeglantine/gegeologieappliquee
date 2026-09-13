@@ -1,4 +1,4 @@
-DEVENIR UN HABITUEL — L'EURO — v1.8
+DEVENIR UN HABITUEL — L'EURO — v1.9
 
 Correctif ciblé Manu / standard.
 
@@ -15,4 +15,4 @@ AUDIO
 
 MISE EN LIGNE
 Dézipper puis remplacer tout le contenu du repository GitHub Pages.
-Faire ensuite Ctrl+F5 et vérifier que v1.8 apparaît en haut.
+Faire ensuite Ctrl+F5 et vérifier que v1.9 apparaît en haut.

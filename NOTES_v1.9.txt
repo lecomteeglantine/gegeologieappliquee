@@ -1,0 +1,9 @@
+Correctif v1.9
+
+- décor plus chargé et plus chaud, orienté radio de nuit fin 90 / début 2000 ;
+- nouveaux panneaux visuels locaux : poste de standard, contact sheet Manu, gros plan Manu ;
+- davantage de photos visibles dans les scènes liées au standard ;
+- conservation du responsive mobile et du bouton repartir de zéro ;
+- clés de sauvegarde mises à jour pour éviter les états en cache de la v1.8.
+
+Audio : la logique d’alternance reste en place ; si tu veux remplacer l’un des deux extraits de Manu, il suffit d’écraser team06.mp3 ou team07.mp3.

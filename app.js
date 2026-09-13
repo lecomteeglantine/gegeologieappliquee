@@ -41,8 +41,8 @@ if(window.EMBEDDED_AUDIO){
   });
 }
 
-const SAVE_KEY = "devenirHabituel_euro_v18";
-const META_KEY = "devenirHabituel_euro_meta_v18";
+const SAVE_KEY = "devenirHabituel_euro_v19";
+const META_KEY = "devenirHabituel_euro_meta_v19";
 const DEFAULT = {
   scene:"intro",
   checkpoint:"intro",
@@ -119,7 +119,7 @@ function currentManuIntroAudio(){return currentRunCount()%2===1?"TEAM06":"TEAM07
 function currentManuIntroLine(){return currentRunCount()%2===1?"Oui, vous êtes sur Fun.":"Bonsoir, tu veux parler de quoi ?";}
 function currentManuIntroLabel(){return currentRunCount()%2===1?"▶ ÉCOUTER MANU : « OUI, VOUS ÊTES SUR FUN »":"▶ ÉCOUTER MANU : « BONSOIR, TU VEUX PARLER DE QUOI ? »";}
 function resetState(){
-  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17"].forEach(k=>localStorage.removeItem(k));
+  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17","devenirHabituel_euro_v18"].forEach(k=>localStorage.removeItem(k));
   incrementRunCount();
   state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast(`Progression remise à zéro. Piste Manu n°${currentRunCount()%2===1?1:2} pour cette partie.`);
 }
@@ -289,27 +289,52 @@ function updateVisual(){
 
 function sceneArtFor(scene){
   const standard="assets/images/standard90s.svg";
+  const desk="assets/images/standard-desk-poster.jpg";
   const manu="assets/images/manu.png";
-  if(["intro","busy1","busy2","callback"].includes(scene))return [{src:"assets/images/bedroom.svg",caption:"Ton téléphone · jeudi soir",kind:"vector"}];
+  const manuClose="assets/images/manu-closeup.jpg";
+  const manuSheet="assets/images/manu-contactsheet.jpg";
+  if(["intro","busy1","busy2","callback"].includes(scene))return [
+    {src:"assets/images/bedroom.svg",caption:"CHEZ TOI · TÉLÉPHONE ET ATTENTE",kind:"vector"},
+    {src:desk,caption:"STANDARD DE NUIT · AMBIANCE 90/2000",kind:"photo poster standard-room"},
+    {src:manuClose,caption:"ARCHIVE MANU · PORTRAIT",kind:"photo portrait"}
+  ];
   if(scene==="manu_intro")return [
     {src:standard,caption:"STANDARD RADIO · ANNÉES 90/2000",kind:"standard-room vector"},
-    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"}
+    {src:desk,caption:"POSTE STANDARD · TÉLÉPHONE, CRT, NOTES",kind:"photo poster standard-room"},
+    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait photo"},
+    {src:manuSheet,caption:"ARCHIVES MANU · SÉRIE PHOTO",kind:"photo contactsheet"}
   ];
   if(["audition","wait"].includes(scene))return [
-    {src:standard,caption:"STANDARD RADIO · LIGNE EN ATTENTE",kind:"standard-room vector"},
-    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"}
+    {src:desk,caption:"STANDARD RADIO · LIGNE EN ATTENTE",kind:"photo poster standard-room"},
+    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait photo"},
+    {src:manuSheet,caption:"ARCHIVES MANU · CABINE / STANDARD",kind:"photo contactsheet"},
+    {src:"assets/images/pseudo.svg",caption:"CAHIER DU STANDARD · PSEUDOS",kind:"vector"}
   ];
-  if(scene==="pseudo")return [{src:"assets/images/pseudo.svg",caption:"LE CAHIER DU STANDARD · TROUVE TON BLAZE",kind:"vector"}];
+  if(scene==="pseudo")return [
+    {src:"assets/images/pseudo.svg",caption:"CAHIER DU STANDARD · TROUVE TON BLAZE",kind:"vector"},
+    {src:manuSheet,caption:"ARCHIVES MANU · AMBIANCE ÉQUIPE",kind:"photo contactsheet"},
+    {src:desk,caption:"STANDARD · FICHES, POST-IT, RÉGIE",kind:"photo poster standard-room"}
+  ];
   if(scene==="offair")return [
-    {src:manu,caption:"MANU · HORS ANTENNE",kind:"portrait"},
-    {src:"assets/images/offair.svg",caption:"PAUSE DISQUE · MICRO COUPÉ",kind:"vector"}
+    {src:manuClose,caption:"MANU · HORS ANTENNE",kind:"photo portrait"},
+    {src:"assets/images/offair.svg",caption:"PAUSE DISQUE · MICRO COUPÉ",kind:"vector"},
+    {src:desk,caption:"RÉGIE DE NUIT · APRÈS LE STANDARD",kind:"photo poster standard-room"}
   ];
-  if(scene==="summary")return [{src:"assets/images/summary.svg",caption:"BILAN DE LA NUIT",kind:"vector"}];
+  if(scene==="summary")return [
+    {src:"assets/images/summary.svg",caption:"BILAN DE LA NUIT",kind:"vector"},
+    {src:desk,caption:"STANDARD · AMBIANCE GÉNÉRALE",kind:"photo poster standard-room"},
+    {src:manuSheet,caption:"ARCHIVES MANU · FIN DE PARCOURS",kind:"photo contactsheet"}
+  ];
   if(["first_intervention","micro_archive","understood","last_test"].includes(scene))return [
     {src:"assets/images/euro.svg",caption:"DÉBAT SUR L’EURO · 07/01/1999",kind:"vector"},
-    {src:"assets/images/onair.svg",caption:"STUDIO · DIRECT",kind:"vector"}
+    {src:"assets/images/onair.svg",caption:"STUDIO · DIRECT",kind:"vector"},
+    {src:desk,caption:"COULISSES DU STANDARD · AVANT L’ANTENNE",kind:"photo poster standard-room"},
+    {src:manuClose,caption:"MANU · À PROXIMITÉ DU STANDARD",kind:"photo portrait"}
   ];
-  return [{src:"assets/images/onair.svg",caption:"STUDIO · DIRECT",kind:"vector"}];
+  return [
+    {src:"assets/images/onair.svg",caption:"STUDIO · DIRECT",kind:"vector"},
+    {src:desk,caption:"AMBIANCE STUDIO 90/2000",kind:"photo poster standard-room"}
+  ];
 }
 function decorateScene(){
   const sceneEl=el.screen.querySelector(".scene");
