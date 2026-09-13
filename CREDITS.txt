@@ -1,6 +1,7 @@
-DEVENIR UN HABITUEL — CRÉDITS MÉDIAS v1.5
+ARCHIVES AUDIO
+- Inserts Gérard / équipe : pack fourni par l'utilisateur.
+- Débat sur l'euro (07/01/1999) : master fourni par l'utilisateur.
+- Extrait standard / Trevor : débat sur l'Affaire Lady Di (02/11/2000), master fourni par l'utilisateur ; extrait utilisé autour de 24:04.
 
-- Photo utilisée dans la scène de Manu : image fournie par l'utilisateur pour ce projet.
-- Archives audio Gérard / équipe : fichiers fournis pendant le développement du projet.
-- Master du débat sur l'euro : fichier fourni pendant le développement du projet.
-- Les autres visuels du jeu sont des compositions graphiques locales du site.
+IMAGE MANU
+- Photo fournie directement par l'utilisateur et intégrée localement.

@@ -1,23 +1,10 @@
-AUDIT v1.5
+AUDIT v1.6
 
-AUDIO
-- 30 fichiers MP3 locaux présents.
-- 30/30 également embarqués en base64 dans audio-data.js.
-- TEAM04 (Manu) vérifié : MP3 mono 44,1 kHz, durée ~5,54 s.
-- Lecteur HTML5 natif visible dans la scène Manu.
-- Le bouton personnalisé et le lecteur natif utilisent les mêmes octets audio authentiques.
-- Le jeu ne dépend plus de l'autoplay.
-- Une panne audio ne bloque plus les choix.
-
-VISUELS
-- manu.png = image fournie par l'utilisateur, locale au repository.
-- Plus aucune URL d'image distante dans app.js.
-- Scène standard : portrait Manu + illustration locale du standard.
-- Photos de groupe retirées de la scène Manu.
-
-STABILITÉ
-- app.js : syntaxe validée par Node.
-- audio-data.js : syntaxe validée par Node.
-- 39 références média locales vérifiées : 0 manquante.
-- index.html, audio-data.js, manu.png et team04.mp3 servis avec les bons types MIME lors du test HTTP local.
-- Nouvelle sauvegarde v1.5 pour éviter les états hérités des versions précédentes.
+- JavaScript app.js : syntaxe vérifiée.
+- audio-data.js : syntaxe vérifiée.
+- 31 fichiers audio référencés et embarqués.
+- TEAM04 : 9,273 s.
+- TEAM05 : 5,538 s.
+- photo de Manu conservée localement : assets/images/manu.png.
+- aucune dépendance au fichier Lady Di complet après build : seul l'extrait nécessaire est embarqué.
+- nouvelle clé de sauvegarde v1.6 pour éviter la reprise d'un état ancien.
