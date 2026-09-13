@@ -1,26 +1,30 @@
-AUDIT PROTOTYPE v1.0 — 13/09/2026
+AUDIT CIBLÉ — DEVENIR UN HABITUEL / L’EURO — v1.1
+Date : 13/09/2026
 
-PÉRIMÈTRE
-Prologue + Émission 1 : L’Euro uniquement.
+PROBLÈMES CONFIRMÉS SUR v1.0
+1. Univers visuel trop vide : grand panneau sombre, très peu d’objets ou de changements de décor.
+2. Manu existait presque uniquement sous forme de texte alors que des inserts authentiques étaient déjà disponibles.
+3. Les bruits de téléphone / ligne / standard étaient insuffisants.
+4. Les scènes sonores étaient visibles sous forme de « chips » techniques, mais pas assez intégrées au jeu.
+5. Les mentions techniques sur les images IA / le statut de prototype cassaient l’immersion.
 
-CONTRÔLES EFFECTUÉS
-[OK] JavaScript : syntaxe validée par Node.
-[OK] 20 scènes définies ; toutes les références setScene() pointent vers une scène existante.
-[OK] 27 fichiers MP3 présents dans le ZIP ; 27/27 lisibles par ffprobe.
-[OK] 24 fichiers de Gérard comparés au pack source : identiques octet par octet.
-[OK] Aucun fichier audio requis n’est chargé depuis Internet.
-[OK] Aucun Math.random() dans la logique du jeu.
-[OK] Les mêmes choix produisent donc les mêmes scores, sons et embranchements.
-[OK] Sauvegarde localStorage après les décisions principales.
-[OK] Après une expulsion, le checkpoint est enregistré avant l’affichage de l’écran d’échec : recharger la page ne permet pas de contourner la sanction.
-[OK] Parcours de réussite possible : standard >= 38 et fun >= 12.
-[OK] Parcours de première expulsion à l’antenne atteignable via accumulation de mauvaises décisions.
-[OK] Responsive CSS prévu pour desktop, tablette et mobile <= 760 px / <= 420 px.
-[OK] Aucun visuel généré par IA ; interface entièrement HTML/CSS.
-[OK] Aucun clonage vocal / synthèse de Gérard.
+CORRECTIONS v1.1
+[OK] 5 univers visuels distincts construits en HTML/CSS : chambre 1999, standard, cahier de pseudos, studio ON AIR, pause cassette OFF AIR, bilan/cahier.
+[OK] Ajout d’une archive photo réelle en fin de chapitre, avec fallback si le serveur d’archive ne répond pas.
+[OK] Ajout du 4e insert équipe : onacceuilletulereprends.mp3.
+[OK] Manu est désormais entendu au standard et pendant les pauses via des inserts authentiques du pack fourni.
+[OK] Réactions audio Manu sur plusieurs mauvaises / bonnes décisions.
+[OK] Insert authentique Phildar utilisé sur une branche OFF AIR.
+[OK] 24 inserts Gérard locaux conservés.
+[OK] 4 inserts équipe locaux présents.
+[OK] Bruits de ligne, occupé, sonnerie et clics ajoutés via Web Audio.
+[OK] Tous les chips audio sont maintenant cliquables pour réécouter les archives.
+[OK] Toutes les mentions visibles « pas d’image IA » / « clonage vocal » retirées du jeu.
+[OK] Aucun Math.random : mêmes choix = mêmes conséquences.
+[OK] 28 fichiers MP3 testés par ffprobe : 28/28 lisibles.
+[OK] 28 références audio du JS : 28/28 fichiers présents.
+[OK] JavaScript validé par node --check.
+[OK] Responsive conservé téléphone / ordinateur.
 
-POINT VOLONTAIREMENT NON INCLUS
-Le master complet du débat sur l’Euro n’a pas été fourni avec les médias locaux. Cette version ne hotlinke pas le MP3 distant. La scène correspondante indique explicitement qu’elle utilise un insert authentique isolé. Elle pourra être remplacée sans modifier le moteur du jeu quand le master autorisé sera disponible.
-
-NOTE PUBLICATION
-Les fichiers audio proviennent du ZIP fourni par l’utilisateur. Avant publication publique sur GitHub Pages, vérifier que la republication de ces archives est autorisée par les ayants droit / la source.
+POINT À GARDER POUR PLUS TARD
+Le master intégral du débat sur l’Euro n’est pas local dans ce repository. La v1.1 utilise donc les inserts authentiques locaux déjà disponibles. Le moteur permet d’ajouter ensuite le vrai extrait long sans refaire l’interface.

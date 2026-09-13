@@ -1,33 +1,18 @@
-DEVENIR UN HABITUEL — PROTOTYPE v1.0
-Prologue + Émission 1 : L’Euro
+DEVENIR UN HABITUEL — L’EURO — v1.1
 
-CONTENU
-- index.html
-- style.css
-- app.js
-- assets/audio/gerard/ : 24 inserts authentiques de Gérard
-- assets/audio/team/ : 3 inserts authentiques de l’équipe, en réserve
+Déploiement GitHub Pages :
+1. Décompresser le ZIP.
+2. Déposer TOUS les fichiers et dossiers directement à la racine du repository.
+3. Conserver index.html, style.css, app.js et assets/ au même niveau.
+4. GitHub Pages : main / (root).
 
-INSTALLATION GITHUB
-Déposer le contenu de ce ZIP directement à la racine du dépôt GitHub Pages.
-Ne pas mettre le dossier lui-même dans un sous-dossier.
+NOUVEAUTÉS v1.1
+- Mise en scène visuelle beaucoup plus riche : chambre 1999, standard, cahier, console radio, cassette OFF AIR, cahier final.
+- Voix authentique de Manu intégrée dans le parcours.
+- 24 inserts Gérard + 4 inserts équipe locaux.
+- Sons de téléphone / ligne / console.
+- Boutons de réécoute pour les archives audio.
+- Une photo d’archive MisterCouzin utilisée comme bonus visuel final ; un fallback est prévu si elle ne charge pas.
+- Parcours toujours entièrement déterministe et sauvegardé en local.
 
-IMPORTANT
-- Aucun visuel généré par IA.
-- Aucune voix synthétique / aucun clonage vocal.
-- Les MP3 de Gérard proviennent du fichier inserts.zip fourni par l’utilisateur.
-- Les choix sont déterministes : aucun Math.random() n’est utilisé pour la logique du jeu.
-- La progression est enregistrée dans localStorage.
-- Le prototype fonctionne sans serveur ni backend.
-- Le débat complet de l’Euro n’est PAS embarqué dans cette version : le jeu le signale explicitement et utilise un insert authentique isolé à la place du passage long E1-A. On pourra remplacer cette scène dès que le master audio autorisé sera disponible.
-
-TEST LOCAL
-Ouvrir index.html dans un navigateur moderne.
-Pour reproduire le comportement GitHub Pages au plus près, servir le dossier en HTTP :
-python -m http.server 8000
-puis ouvrir http://localhost:8000
-
-COMMANDES
-A/B/C/D au clavier sélectionnent les choix correspondants.
-Bouton SON pour couper/réactiver l’audio.
-Bouton ↺ pour recommencer.
+Pour mettre à jour la version actuellement en ligne, remplacer le contenu du repository par le contenu de ce ZIP en conservant la même structure.

@@ -101,3 +101,116 @@ button{touch-action:manipulation}
 @media(max-width:760px){.app{padding:12px 10px 30px}.studio-shell{grid-template-columns:1fr}.side-panel{position:static;grid-template-columns:1fr 1fr}.line-card{grid-column:1/-1}.wave{display:none}.main-panel,.screen{min-height:590px}.screen{padding:28px 18px}.clock-card strong{font-size:26px}.onair-box{min-height:100%}.pseudo-grid{gap:8px}.scene h1{font-size:40px}.summary-grid{grid-template-columns:1fr}.brand{font-size:10px;letter-spacing:.08em}}
 @media(max-width:420px){.topbar{padding:0 10px}.brand span:last-child{max-width:150px}.icon-btn{padding:7px 8px}.side-panel{grid-template-columns:1fr 1fr}.clock-card{padding:13px}.onair-box{padding:12px}.screen{padding:24px 15px}.choice{padding:13px}.pseudo-grid{grid-template-columns:1fr 1fr}.pseudo-token{font-size:14px;padding:10px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* v1.1 — richer illustrated radio world */
+body{
+  background:
+    radial-gradient(circle at 12% 15%,rgba(127,85,48,.22),transparent 28%),
+    radial-gradient(circle at 88% 12%,rgba(30,90,105,.18),transparent 30%),
+    linear-gradient(145deg,#1a1714 0%,#0b0d10 52%,#181210 100%);
+}
+.main-panel{
+  background:linear-gradient(180deg,#15181e 0%,#0e1014 100%);
+  border-color:#3b3936;
+}
+.visual-layer{
+  min-height:248px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,#3b332b,#181b20 72%,#111318);
+  isolation:isolate;
+}
+.visual-layer::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:8;
+  background:linear-gradient(rgba(255,255,255,.025) 50%,transparent 50%);
+  background-size:100% 4px;mix-blend-mode:soft-light;opacity:.7
+}
+.visual-caption{position:absolute;left:16px;top:14px;z-index:10;font-size:10px;font-weight:900;letter-spacing:.16em;color:#f6ddae;background:#151515c9;border:1px solid #ffffff26;border-radius:999px;padding:7px 10px}
+.visual-caption.red{color:#ffb3ae}.visual-caption.green{color:#a8f7bc}
+.screen{min-height:470px;padding-top:34px;padding-bottom:40px}
+
+/* Bedroom / caller desk */
+.v-bedroom{position:absolute;inset:0;background:linear-gradient(#75604c 0 58%,#493524 58% 62%,#251b16 62%)}
+.v-bedroom .wall-line{position:absolute;left:0;right:0;top:57%;height:4px;background:#2a1c15aa}
+.v-bedroom .poster{position:absolute;right:8%;top:18px;width:118px;height:148px;background:#e8dfca;border:7px solid #d3c5aa;box-shadow:0 9px 20px #0007;transform:rotate(2deg);display:grid;place-items:center;color:#27211c;font:900 19px/1.1 "Courier New",monospace;text-align:center}
+.v-bedroom .poster span{display:block;font-size:10px;margin-top:8px;letter-spacing:.14em;color:#7a332c}
+.v-bedroom .radio{position:absolute;left:10%;bottom:26px;width:230px;height:92px;border-radius:10px;background:linear-gradient(#31343b,#181a1f);border:5px solid #4b4c4b;box-shadow:0 13px 28px #0008}
+.v-bedroom .radio::before{content:"";position:absolute;left:15px;top:19px;width:108px;height:45px;border-radius:4px;background:repeating-linear-gradient(90deg,#0a0b0d 0 4px,#34383e 4px 6px);box-shadow:inset 0 0 0 3px #111}
+.v-bedroom .radio::after{content:"FM 101.9";position:absolute;right:14px;top:22px;width:70px;height:28px;background:#121d12;border:2px solid #69715f;color:#96ff91;font:700 12px/28px "Courier New",monospace;text-align:center;box-shadow:inset 0 0 12px #4cff3c22}
+.v-bedroom .desk-phone{position:absolute;left:44%;bottom:24px;width:184px;height:72px;border-radius:18px 18px 12px 12px;background:#d7c8ae;border:4px solid #8f8069;box-shadow:0 13px 24px #0008}
+.v-bedroom .desk-phone::before{content:"";position:absolute;left:15px;right:15px;top:-24px;height:34px;border:10px solid #e4d7c0;border-bottom-width:6px;border-radius:28px 28px 16px 16px;filter:drop-shadow(0 4px 3px #0005)}
+.v-bedroom .desk-phone::after{content:"";position:absolute;width:44px;height:44px;border-radius:50%;border:7px dotted #6d655a;left:65px;top:17px}
+.v-bedroom .clock-mini{position:absolute;left:32%;top:30px;background:#191a1b;border:5px solid #454341;border-radius:8px;color:#f14337;padding:9px 13px;font:900 28px/1 "Courier New",monospace;box-shadow:0 8px 20px #0007}
+
+/* Standard console */
+.v-standard{position:absolute;inset:0;background:linear-gradient(180deg,#77715e 0 34%,#2c3034 34% 100%)}
+.v-standard .window{position:absolute;right:7%;top:20px;width:32%;height:108px;background:linear-gradient(#172530,#0a0f13);border:7px solid #a29a7f;box-shadow:inset 0 0 30px #8cd7f322}
+.v-standard .console{position:absolute;left:7%;right:7%;bottom:18px;height:112px;border-radius:9px 9px 3px 3px;background:linear-gradient(#4a5055,#25292d);border:5px solid #17191b;transform:perspective(450px) rotateX(5deg);box-shadow:0 16px 28px #0008}
+.v-standard .buttons{position:absolute;left:22px;right:22px;top:18px;display:grid;grid-template-columns:repeat(9,1fr);gap:8px}
+.v-standard .buttons i{height:18px;border-radius:3px;background:#c9d1c8;border:2px solid #1d2022;box-shadow:inset 0 -4px #788078}
+.v-standard .buttons i:nth-child(3n){background:#ebbb4f}.v-standard .buttons i:nth-child(5n){background:#e5675e}.v-standard .buttons i:nth-child(7n){background:#77b77f}
+.v-standard .meters{position:absolute;left:24px;right:24px;bottom:17px;display:flex;gap:15px}
+.v-standard .meters b{width:78px;height:32px;background:#e5d9b8;border:4px solid #1c1d1f;border-radius:3px;position:relative;overflow:hidden}
+.v-standard .meters b::after{content:"";position:absolute;width:3px;height:27px;background:#b52b28;left:50%;bottom:-2px;transform-origin:bottom;transform:rotate(34deg)}
+.v-standard .headset{position:absolute;left:8%;top:19px;width:96px;height:76px;border:10px solid #242526;border-bottom:0;border-radius:55px 55px 0 0}
+.v-standard .headset::before,.v-standard .headset::after{content:"";position:absolute;bottom:-12px;width:23px;height:38px;border-radius:8px;background:#171819;border:5px solid #555}
+.v-standard .headset::before{left:-13px}.v-standard .headset::after{right:-13px}
+
+/* Pseudo / notebook */
+.v-pseudo{position:absolute;inset:0;background:linear-gradient(135deg,#4d4538,#251f1a)}
+.v-pseudo .paper{position:absolute;left:50%;top:19px;transform:translateX(-50%) rotate(-1deg);width:min(520px,72%);height:196px;background:#eee5c8;border:1px solid #9d9278;box-shadow:10px 15px 28px #0007;padding:27px 34px;color:#2d2a24;background-image:repeating-linear-gradient(#0000 0 28px,#8ab0cf55 28px 29px)}
+.v-pseudo .paper::before{content:"STANDARD — PSEUDOS";font:800 16px/1 "Courier New",monospace;letter-spacing:.09em}
+.v-pseudo .scribble{position:absolute;left:42px;top:67px;font:700 18px/1.8 "Comic Sans MS",cursive;transform:rotate(-1deg);color:#34383d}
+.v-pseudo .pen{position:absolute;right:17%;bottom:29px;width:11px;height:155px;background:linear-gradient(90deg,#173b77,#5b84c4,#173b77);transform:rotate(63deg);border-radius:5px;box-shadow:2px 4px 7px #0008}
+
+/* ON AIR console */
+.v-onair{position:absolute;inset:0;background:radial-gradient(circle at 50% 20%,#562622 0 14%,#272427 42%,#121417 100%)}
+.v-onair .lamp{position:absolute;left:50%;top:18px;transform:translateX(-50%);background:#8c1717;border:5px solid #2a1010;color:#fff2ec;padding:12px 28px;border-radius:5px;font:900 20px/1 Arial,sans-serif;letter-spacing:.18em;box-shadow:0 0 30px #f33a2f99,inset 0 0 14px #ff5e55}
+.v-onair .mic{position:absolute;left:51%;top:82px;width:58px;height:78px;border-radius:28px;background:repeating-linear-gradient(90deg,#1b1d20 0 5px,#777b80 5px 7px);border:5px solid #111;box-shadow:0 13px 24px #0009}
+.v-onair .mic::after{content:"";position:absolute;left:23px;top:73px;width:9px;height:92px;background:#202326;transform:rotate(-13deg);transform-origin:top}
+.v-onair .deck{position:absolute;left:7%;right:7%;bottom:17px;height:91px;border:5px solid #17191c;background:#3b4147;border-radius:7px;box-shadow:0 14px 26px #0009}
+.v-onair .faders{position:absolute;inset:14px 23px;display:grid;grid-template-columns:repeat(8,1fr);gap:15px}
+.v-onair .faders i{position:relative;background:#1b1d20;border-radius:4px}
+.v-onair .faders i::before{content:"";position:absolute;left:50%;top:5px;bottom:5px;width:2px;background:#72777b}
+.v-onair .faders i::after{content:"";position:absolute;width:19px;height:10px;background:#e0ded5;border:2px solid #202225;border-radius:3px;left:50%;top:var(--f,45%);transform:translate(-50%,-50%)}
+.v-onair .faders i:nth-child(2){--f:68%}.v-onair .faders i:nth-child(3){--f:24%}.v-onair .faders i:nth-child(4){--f:56%}.v-onair .faders i:nth-child(5){--f:35%}.v-onair .faders i:nth-child(6){--f:75%}.v-onair .faders i:nth-child(7){--f:42%}.v-onair .faders i:nth-child(8){--f:61%}
+
+/* OFF AIR tape deck */
+.v-offair{position:absolute;inset:0;background:linear-gradient(#6b6254 0 40%,#292a2a 40%)}
+.v-offair .cassette{position:absolute;left:50%;top:24px;transform:translateX(-50%) rotate(-2deg);width:300px;height:168px;border-radius:13px;background:#ded5bd;border:5px solid #302e2a;box-shadow:0 17px 28px #0008}
+.v-offair .cassette::before,.v-offair .cassette::after{content:"";position:absolute;top:58px;width:61px;height:61px;border-radius:50%;background:radial-gradient(circle,#252525 0 13%,#d9cfb5 14% 27%,#252525 28% 38%,#e8dec6 39%);border:3px solid #4c473f}
+.v-offair .cassette::before{left:48px}.v-offair .cassette::after{right:48px}
+.v-offair .label{position:absolute;left:41px;right:41px;top:18px;height:34px;background:#f5eed8;border:1px solid #b8ad94;color:#28231e;font:900 14px/34px "Courier New",monospace;text-align:center;letter-spacing:.09em}
+.v-offair .offair-stamp{position:absolute;right:8%;bottom:27px;color:#f6ca66;border:4px double #f6ca66;padding:10px 15px;font:900 18px/1 "Courier New",monospace;transform:rotate(4deg)}
+
+/* End notebook + optional authentic archive image */
+.v-summary{position:absolute;inset:0;background:linear-gradient(135deg,#554739,#241d18)}
+.v-summary .notebook{position:absolute;left:7%;top:18px;width:46%;height:205px;background:#eee7c9;border:2px solid #978d73;box-shadow:10px 14px 25px #0008;transform:rotate(-2deg);color:#25231e;padding:30px 27px;background-image:repeating-linear-gradient(#0000 0 29px,#7fa8c855 29px 30px)}
+.v-summary .notebook::before{content:"CAHIER DES BONS CLIENTS";font:900 14px/1 "Courier New",monospace;letter-spacing:.08em}
+.v-summary .notebook b{display:block;margin-top:27px;font:700 22px/1.5 "Comic Sans MS",cursive}
+.v-summary .archive-frame{position:absolute;right:5%;top:18px;width:38%;height:205px;background:#ddd2b8;border:8px solid #efe7d3;padding:7px 7px 25px;box-shadow:10px 14px 27px #0009;transform:rotate(2deg);overflow:hidden}
+.v-summary .archive-frame img{width:100%;height:100%;object-fit:cover;filter:sepia(.1) contrast(.98)}
+.v-summary .archive-frame::after{content:"ARCHIVE · MISTERCOUZIN · 2006";position:absolute;left:0;right:0;bottom:5px;text-align:center;color:#332e28;font:800 9px/1 Arial;letter-spacing:.08em}
+.v-summary .archive-frame.is-fallback{background:linear-gradient(145deg,#2d2f32,#111)}
+.v-summary .archive-frame.is-fallback::before{content:"ARCHIVE\AINDISPONIBLE";white-space:pre;position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#cfc5ad;font:900 14px/1.3 "Courier New",monospace}
+.v-summary .archive-frame.is-fallback img{display:none}
+
+.sound-badge{display:inline-flex;align-items:center;gap:7px;margin:8px 0 12px;padding:7px 10px;border-radius:999px;background:#171a1f;border:1px solid #3d424a;font-size:10px;font-weight:900;letter-spacing:.1em;color:#ffc95e}
+.sound-badge::before{content:"●";color:#ff675f;text-shadow:0 0 8px #ff675f}
+.dialogue.manu{background:linear-gradient(90deg,rgba(255,196,93,.08),transparent);padding-top:10px;padding-bottom:10px}
+.audio-chip{background:linear-gradient(90deg,#15191f,#101215);border-color:#454b55}
+.source-note{display:none}
+
+@media(max-width:760px){
+  .visual-layer{min-height:195px}.screen{min-height:470px}
+  .v-bedroom .poster{right:4%;width:90px;height:118px;font-size:15px}.v-bedroom .radio{left:4%;width:180px;height:76px}.v-bedroom .radio::before{width:80px;height:36px}.v-bedroom .radio::after{right:10px;width:58px;font-size:10px}.v-bedroom .desk-phone{left:auto;right:6%;width:135px;height:58px}.v-bedroom .desk-phone::after{left:46px;width:35px;height:35px}.v-bedroom .clock-mini{left:35%;top:16px;font-size:20px}
+  .v-standard .headset{display:none}.v-standard .window{right:5%;width:40%;height:86px}.v-standard .console{left:4%;right:4%;height:92px}.v-standard .buttons{gap:5px}.v-standard .buttons i{height:13px}
+  .v-pseudo .paper{width:82%;height:155px;padding:21px 25px}.v-pseudo .scribble{top:52px;font-size:15px}.v-pseudo .pen{height:112px;right:10%}
+  .v-onair .lamp{font-size:15px;padding:9px 20px}.v-onair .mic{top:69px;width:45px;height:60px}.v-onair .deck{height:72px;left:4%;right:4%}.v-onair .faders{inset:10px 13px;gap:8px}
+  .v-offair .cassette{width:230px;height:135px}.v-offair .cassette::before,.v-offair .cassette::after{top:49px;width:48px;height:48px}.v-offair .cassette::before{left:39px}.v-offair .cassette::after{right:39px}.v-offair .offair-stamp{font-size:13px;right:4%}
+  .v-summary .notebook{left:4%;width:49%;height:160px;padding:22px 18px}.v-summary .notebook::before{font-size:10px}.v-summary .notebook b{font-size:16px}.v-summary .archive-frame{right:3%;width:41%;height:160px}
+}
+.audio-chip.audio-play{width:100%;text-align:left;cursor:pointer;font:inherit;color:#cdd3da}
+.audio-chip.audio-play:hover{border-color:#777f89;background:#181d23}
+.audio-chip.audio-play em{margin-left:auto;font-style:normal;color:#ffc45d;font-size:12px}
