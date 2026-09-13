@@ -1,18 +1,8 @@
-DEVENIR UN HABITUEL — L'EURO — v1.9
+DEVENIR UN HABITUEL — v2.1
 
-Correctif ciblé Manu / standard.
+Correction du bug des images cassées de la v2.0.
+Les 13 images sont maintenant intégrées directement dans app.js, le même fichier qui fait tourner le jeu.
+Le site n’a donc plus besoin de charger image-data.js pour afficher les visuels.
 
-CHANGEMENT PRINCIPAL
-- L'ancien insert TEAM04 a été remplacé par un extrait du débat sur l'Affaire Lady Di (02/11/2000), fourni par l'utilisateur.
-- L'extrait contient le passage : « Oui, vous êtes sur Fun. Bonsoir Trevor. »
-- Durée : environ 9,27 s.
-- L'ancien insert de production de Manu est conservé séparément sous TEAM05 pour les scènes hors antenne.
-
-AUDIO
-- TEAM04 = assets/audio/team/team04.mp3 (nouveau standard / Fun / Trevor)
-- TEAM05 = assets/audio/team/team05.mp3 (ancien insert de production)
-- Les sons restent aussi embarqués en base64 dans audio-data.js pour sécuriser la lecture sur GitHub Pages.
-
-MISE EN LIGNE
-Dézipper puis remplacer tout le contenu du repository GitHub Pages.
-Faire ensuite Ctrl+F5 et vérifier que v1.9 apparaît en haut.
+Upload GitHub : remplace tout le contenu du repository avec ce ZIP.
+Puis Ctrl+F5 et vérifie v2.1 en haut.
