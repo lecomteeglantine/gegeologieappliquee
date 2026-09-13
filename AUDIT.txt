@@ -1,19 +1,29 @@
-AUDIT v1.2
+AUDIT v1.3
 
-Points corrigés
-1. Audio
-- préchargement local de tous les fichiers ;
-- déverrouillage du son au premier clic/clavier ;
-- retrait des lectures automatiques fragiles au rendu de scène ;
-- boutons d'écoute explicites sur les archives ;
-- ajout de 2 extraits authentiques du débat sur l'euro.
+AUDIO
+- Audio engine switched to Web Audio API after one user gesture; local MP3s decoded and cached.
+- Fallback to HTMLAudioElement if decoding fails.
+- Manu's verified insert "On accueille tu le reprends..." is triggered automatically at the standard and remains replayable.
+- Additional authentic Manu inserts used as feedback.
+- 30 local MP3 files probed successfully.
 
-2. Visuel
-- remplacement du bloc visuel précédent par des panneaux illustrés locaux (SVG) ;
-- ajout d'une waveform locale dérivée du master euro ;
-- suppression de la dépendance à la photo distante MisterCouzin.
+RESET
+- Visible "REPARTIR DE ZÉRO" button in the header.
+- Reset removes current and earlier local-save keys and returns to 23:56.
 
-3. Stabilité
-- nouvelle clé de sauvegarde locale pour éviter les états cassés d'anciennes versions ;
-- 30 références média vérifiées localement ;
-- aucune référence de fichier manquante dans app.js.
+SMARTPHONE
+- Main game moves above the status HUD on screens <=760 px.
+- Tested layouts at 390x844 and 360x740: document width equals viewport width, no horizontal overflow.
+- Touch choices >=62 px high; inputs use 16 px font to avoid iOS auto-zoom.
+
+VISUALS
+- Every playable scene now contains its own visible illustration/card.
+- Standard, studio and pause scenes use public-domain / CC0 archive-style photographs from Wikimedia Commons with local SVG fallbacks.
+- Pseudo and euro scenes use local bespoke vector panels.
+- Remote images are non-essential; the game remains usable if Wikimedia is unavailable.
+
+CODE / ASSETS
+- JavaScript syntax checked with node --check.
+- Every local media reference exists.
+- Every setScene target maps to a defined scene.
+- No random number usage.

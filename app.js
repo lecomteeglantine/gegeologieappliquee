@@ -26,12 +26,12 @@ const AUDIO = {
   TEAM01:["assets/audio/team/team01.mp3","Manu — OK"],
   TEAM02:["assets/audio/team/team02.mp3","Manu — c’est pas possible"],
   TEAM03:["assets/audio/team/team03.mp3","Phildar — faire gueuler le moustachu"],
-  TEAM04:["assets/audio/team/team04.mp3","Manu — production au standard"],
+  TEAM04:["assets/audio/team/team04.mp3","Manu — On accueille, tu le reprends…"],
   EURO01:["assets/audio/euro/euro01_faux_serieux.mp3","Extrait authentique · débat sur l’euro · faux sérieux"],
   EURO02:["assets/audio/euro/euro02_montee_tension.mp3","Extrait authentique · débat sur l’euro · montée de tension"],
 };
 
-const SAVE_KEY = "devenirHabituel_euro_v12";
+const SAVE_KEY = "devenirHabituel_euro_v13";
 const DEFAULT = {
   scene:"intro",
   checkpoint:"intro",
@@ -57,7 +57,6 @@ const DEFAULT = {
 };
 
 let state = loadState();
-let activeAudio = null;
 let audioToken = 0;
 
 const el = {
@@ -88,7 +87,10 @@ function loadState(){
   }catch(e){return {...DEFAULT};}
 }
 function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));}
-function resetState(){state={...DEFAULT,reactions:{}};save();stopAudio();render();}
+function resetState(){
+  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13"].forEach(k=>localStorage.removeItem(k));
+  state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast("Progression remise à zéro.");
+}
 function setScene(scene, checkpoint){state.scene=scene;if(checkpoint)state.checkpoint=checkpoint;save();render();}
 function clamp(){state.standard=Math.max(0,Math.min(100,state.standard));state.fun=Math.max(0,Math.min(100,state.fun));state.reputation=Math.max(0,Math.min(100,state.reputation));state.gege=Math.max(0,Math.min(100,state.gege));state.grille=Math.max(0,Math.min(100,state.grille));}
 function apply(delta={}){for(const [k,v] of Object.entries(delta)){if(typeof state[k]==="number")state[k]+=v;}clamp();save();updateHUD();}
@@ -114,11 +116,11 @@ function updateHUD(){
   if(mode==="onair"){el.onairBox.classList.add("live");el.onairText.textContent="ON AIR";}
   else if(mode==="waiting"){el.onairBox.classList.add("waiting");el.onairText.textContent=state.scene==="offair"?"OFF AIR":"EN ATTENTE";}
   else el.onairText.textContent="HORS LIGNE";
-  el.soundToggle.textContent=state.muted?"SON ✕":"SON ◼";
+  el.soundToggle.textContent=state.muted?"SON OFF":"SON 🔊";
   el.soundToggle.setAttribute("aria-pressed",String(state.muted));
 }
 function esc(s=""){return s.replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
-function choice(letter,text,fn,small=""){
+function choice(letter,text,small=""){
   return `<button class="choice" type="button" data-choice="${letter}"><span class="choice-key">${letter}</span><span>${text}${small?`<small>${small}</small>`:""}</span></button>`;
 }
 function bindChoices(map){Object.entries(map).forEach(([key,fn])=>{const b=el.screen.querySelector(`[data-choice="${key}"]`);if(b)b.addEventListener("click",fn);});}
@@ -134,51 +136,89 @@ function dialogue(speaker,text,kind=""){
 function audioChip(id,tag="ARCHIVE AUTHENTIQUE"){const a=AUDIO[id];return `<button class="audio-chip audio-play" type="button" data-audio="${id}" title="Réécouter"><span class="dot"></span><strong>${esc(tag)}</strong><span>${id} · ${esc(a?.[1]||"")}</span><em>▶</em></button>`;}
 function toast(text){el.toast.textContent=text;el.toast.classList.add("show");setTimeout(()=>el.toast.classList.remove("show"),1800);}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-const audioBank={};
 let sfxContext=null;
+let activeSource=null;
+let activeAudio=null;
 let soundEnabledThisSession=false;
-function initAudioBank(){
-  Object.entries(AUDIO).forEach(([id,[src]])=>{
-    const a=new Audio(src);
-    a.preload="auto";
-    a.playsInline=true;
-    audioBank[id]=a;
-  });
-}
-async function unlockAudio(){
-  if(soundEnabledThisSession) return true;
-  soundEnabledThisSession=true;
-  try{
-    Object.values(audioBank).forEach(a=>{try{a.load();}catch(e){}});
-    const ctx=getSfxContext();
-    if(ctx.state==="suspended") await ctx.resume();
-    state.soundReady=true;save();
-    return true;
-  }catch(e){
-    return false;
-  }
-}
-function stopAudio(){audioToken++;if(activeAudio){activeAudio.pause();activeAudio.currentTime=0;activeAudio=null;}el.wave.classList.remove("playing");}
-async function playSound(id,{wait=true}={}){
-  if(!AUDIO[id]||state.muted)return;
-  await unlockAudio();
-  stopAudio();
-  const token=audioToken;
-  const [src]=AUDIO[id];
-  const base=audioBank[id] || new Audio(src);
-  const a=base.cloneNode(true);
-  a.preload="auto";
-  a.playsInline=true;
-  activeAudio=a;el.wave.classList.add("playing");bumpReaction(id);
-  try{await a.play();}catch(e){el.wave.classList.remove("playing");toast("Le navigateur a bloqué l’audio. Clique sur SON ◼ puis réessaie.");return;}
-  if(!wait)return;
-  await new Promise(resolve=>{a.addEventListener("ended",resolve,{once:true});a.addEventListener("error",resolve,{once:true});});
-  if(token===audioToken)el.wave.classList.remove("playing");
-}
-
+const decodedBuffers=new Map();
+const decodePromises=new Map();
 function getSfxContext(){
   if(!sfxContext) sfxContext=new (window.AudioContext||window.webkitAudioContext)();
   return sfxContext;
+}
+async function preloadBuffer(id){
+  if(decodedBuffers.has(id)) return decodedBuffers.get(id);
+  if(decodePromises.has(id)) return decodePromises.get(id);
+  if(!AUDIO[id]) throw new Error(`Unknown audio ${id}`);
+  const promise=(async()=>{
+    const ctx=getSfxContext();
+    const response=await fetch(AUDIO[id][0],{cache:"force-cache"});
+    if(!response.ok) throw new Error(`HTTP ${response.status} for ${AUDIO[id][0]}`);
+    const data=await response.arrayBuffer();
+    const buffer=await ctx.decodeAudioData(data.slice(0));
+    decodedBuffers.set(id,buffer);
+    return buffer;
+  })().finally(()=>decodePromises.delete(id));
+  decodePromises.set(id,promise);
+  return promise;
+}
+async function unlockAudio(){
+  if(state.muted)return false;
+  try{
+    const ctx=getSfxContext();
+    if(ctx.state==="suspended") await ctx.resume();
+    soundEnabledThisSession=true;
+    state.soundReady=true;save();
+    ["TEAM04","TEAM01","TEAM02","GG01","GG03","GG04","GG10","GG12","GG13","EURO01","EURO02"].forEach(id=>preloadBuffer(id).catch(()=>{}));
+    return true;
+  }catch(e){return false;}
+}
+function stopAudio(){
+  audioToken++;
+  if(activeSource){try{activeSource.stop();}catch(e){} activeSource=null;}
+  if(activeAudio){try{activeAudio.pause();activeAudio.currentTime=0;}catch(e){} activeAudio=null;}
+  el.wave.classList.remove("playing");
+}
+async function playSound(id,{wait=true}={}){
+  if(!AUDIO[id]||state.muted)return false;
+  await unlockAudio();
+  stopAudio();
+  const token=audioToken;
+  bumpReaction(id);
+  el.wave.classList.add("playing");
+  try{
+    const ctx=getSfxContext();
+    const buffer=await preloadBuffer(id);
+    const source=ctx.createBufferSource();
+    const gain=ctx.createGain();
+    gain.gain.value=1;
+    source.buffer=buffer;source.connect(gain);gain.connect(ctx.destination);
+    activeSource=source;
+    let resolveEnded;
+    const ended=new Promise(resolve=>{resolveEnded=resolve;});
+    source.onended=()=>{
+      if(activeSource===source)activeSource=null;
+      if(token===audioToken)el.wave.classList.remove("playing");
+      resolveEnded();
+    };
+    source.start(0);
+    if(!wait)return true;
+    await ended;
+    return true;
+  }catch(e){
+    try{
+      const a=new Audio(AUDIO[id][0]);
+      a.preload="auto";a.playsInline=true;activeAudio=a;
+      await a.play();
+      if(wait) await new Promise(resolve=>{a.addEventListener("ended",resolve,{once:true});a.addEventListener("error",resolve,{once:true});});
+      if(token===audioToken)el.wave.classList.remove("playing");
+      return true;
+    }catch(err){
+      el.wave.classList.remove("playing");
+      toast("Audio bloqué. Appuie sur SON puis réessaie.");
+      return false;
+    }
+  }
 }
 function beep(freq=440,duration=.12,volume=.035,startDelay=0){
   if(state.muted)return Promise.resolve();
@@ -220,6 +260,27 @@ function updateVisual(){
   else el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="assets/images/onair.svg" alt="">${wave}<div class="visual-caption red">STUDIO · DIRECT</div><div class="info-pill red">MASTER EURO · ARCHIVES AUTHENTIQUES</div></div>`;
 }
 
+function sceneArtFor(scene){
+  if(["intro","busy1","busy2","callback"].includes(scene))return ["assets/images/bedroom.svg","Ton téléphone · jeudi soir","assets/images/bedroom.svg","vector"];
+  if(["manu_intro","audition","wait"].includes(scene))return ["https://upload.wikimedia.org/wikipedia/commons/8/84/Telephone_Headset.jpg","Le standard · téléphone et casque, ambiance années 1990","assets/images/standard.svg","photo"];
+  if(scene==="pseudo")return ["assets/images/pseudo.svg","Le cahier du standard · trouve ton blaze","assets/images/pseudo.svg","vector"];
+  if(scene==="offair")return ["https://upload.wikimedia.org/wikipedia/commons/3/3f/Audio_cassette_tapes.jpg","Pause disque · cassette audio","assets/images/offair.svg","photo"];
+  if(scene==="summary")return ["assets/images/summary.svg","Bilan de la première nuit","assets/images/summary.svg","vector"];
+  if(["first_intervention","micro_archive","understood","last_test"].includes(scene))return ["assets/images/euro.svg","Le débat sur l’euro · 07/01/1999","assets/images/euro.svg","vector"];
+  return ["https://upload.wikimedia.org/wikipedia/commons/f/f7/Mixing_console.jpg","Studio · console de mixage","assets/images/onair.svg","photo"];
+}
+function decorateScene(){
+  const sceneEl=el.screen.querySelector(".scene");
+  if(!sceneEl||sceneEl.querySelector(".scene-visual"))return;
+  const [src,caption,fallback,kind]=sceneArtFor(state.scene);
+  const fig=document.createElement("figure");
+  fig.className=`scene-visual ${kind==="photo"?"photo":"vector"}`;
+  fig.innerHTML=`<img src="${src}" alt="" data-fallback="${fallback}"><figcaption>${esc(caption)}</figcaption></figure>`;
+  const img=fig.querySelector("img");
+  img.addEventListener("error",()=>{if(img.src.endsWith(fallback))return;img.src=fallback;fig.classList.remove("photo");fig.classList.add("vector");},{once:true});
+  sceneEl.prepend(fig);
+}
+
 function modal({kicker="",title,text,actions=[]}){
   el.modalKicker.textContent=kicker;el.modalTitle.textContent=title;el.modalText.textContent=text;el.modalActions.innerHTML="";
   actions.forEach(a=>{const b=document.createElement("button");b.className=`btn ${a.className||"primary"}`;b.textContent=a.label;b.onclick=()=>{el.modal.classList.add("hidden");a.onClick();};el.modalActions.appendChild(b);});
@@ -229,14 +290,14 @@ function gerbe({reason="Le standard a coupé ta ligne.",resume="intro",hard=fals
   stopAudio();state.gerbes++;state.scene=resume;state.checkpoint=resume;save();updateHUD();
   modal({kicker:"STANDARD",title:"TU GERBES AU STANDARD",text:reason,actions:[{label:hard?"REPRENDRE AU DÉBUT DU DÉBAT":"RAPPELER",onClick:()=>setScene(resume,resume)}]});
 }
-function render(){stopAudio();updateHUD();updateVisual();const fn=scenes[state.scene]||scenes.intro;fn();}
+function render(){stopAudio();updateHUD();updateVisual();const fn=scenes[state.scene]||scenes.intro;fn();decorateScene();}
 
 const scenes={
-  intro(){state.clock="23:56";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">CLIQUE UNE FOIS POUR ACTIVER LE SON DES ARCHIVES</div>${btn("☎ ACTIVER LE SON ET APPELER LE STANDARD",async()=>{await unlockAudio();await playSfx("click");setScene("busy1","intro");})}</div>`;},
+  intro(){state.clock="23:56";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">SON DES ARCHIVES · ACTIVE-LE ICI</div>${btn("☎ ACTIVER LE SON ET APPELER LE STANDARD",async()=>{await unlockAudio();await playSfx("click");setScene("busy1","intro");})}</div>`;},
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   busy2(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 02</div><h2>Toujours occupé.</h2><p class="muted">Tu raccroches. Tu recomposes.</p>${btn("RAPPELER",async()=>{await playSfx("ring");await playSfx("click");setScene("manu_intro");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
-  manu_intro(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">VOIX AUTHENTIQUE DE MANU AU STANDARD</div><p class="muted">Avant de te répondre, tu l’entends gérer une autre ligne.</p>${audioChip("TEAM04","MANU · ARCHIVE DE PRODUCTION")}${dialogue("MANU — STANDARD","Fun Radio, bonsoir.<br><br>C’est pour quoi ?","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
-    bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:()=>{apply({standard:10,fun:4});toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
+  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">MANU · VRAI INSERT DU STANDARD</div><p>Cette fois, sa voix doit se déclencher automatiquement. Tu peux aussi la relancer ici :</p>${audioChip("TEAM04","ÉCOUTER MANU · ARCHIVE AUTHENTIQUE")}${dialogue("LE STANDARD","Manu te prend sur la ligne. Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;setTimeout(()=>playSound("TEAM04",{wait:false}),40);
+    bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
   },
   audition(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">AUDITION DU STANDARD</div>${dialogue("MANU","Pourquoi je te passe ?","manu")}<div class="choices">${choice("A","Parce que Gérard est nul.")}${choice("B","J’ai vraiment un avis sur l’euro.")}${choice("C","Je voulais savoir si les billets de Monopoly allaient aussi passer à l’euro.")}${choice("D","Passe-moi et tu verras.")}</div></div>`;
     bindChoices({A:async()=>{apply({standard:-7});await playSound("TEAM02");gerbe({reason:"Le standard cherchait quelqu’un capable de jouer, pas seulement d’insulter.",resume:"manu_intro"});},B:()=>{apply({standard:3,fun:-1});setScene("pseudo","pseudo");},C:async()=>{apply({standard:10,fun:7});await playSound("TEAM04");toast("Manu a ri.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-3});if(state.standard<25){await playSound("TEAM02");gerbe({reason:"Tu as joué au mystérieux un peu trop tôt.",resume:"manu_intro"});}else setScene("pseudo","pseudo");}});
@@ -244,11 +305,11 @@ const scenes={
   pseudo(){
     const firsts=["Alex","Jean","Guy","Aude","Marc","Paul"], seconds=["Térieur","Bon","Don","Iteur","Assin","Émique"];
     el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD</div>${dialogue("MANU","Ton pseudo ?","manu")}<p class="muted">Assemble un prénom et une fin. Gérard doit pouvoir l’annoncer.</p><div class="pseudo-grid"><div class="pseudo-column"><h3>PREMIÈRE PARTIE</h3>${firsts.map(x=>`<button class="pseudo-token ${state.first===x?"selected":""}" data-first="${x}">${x}</button>`).join("")}</div><div class="pseudo-column"><h3>DEUXIÈME PARTIE</h3>${seconds.map(x=>`<button class="pseudo-token ${state.second===x?"selected":""}" data-second="${x}">${x}</button>`).join("")}</div></div><div class="pseudo-result">${state.first&&state.second?esc(state.first+" "+state.second):"—"}</div><div id="pseudoActions"></div></div>`;
-    el.screen.querySelectorAll("[data-first]").forEach(b=>b.onclick=()=>{state.first=b.dataset.first;save();scenes.pseudo();});
-    el.screen.querySelectorAll("[data-second]").forEach(b=>b.onclick=()=>{state.second=b.dataset.second;save();scenes.pseudo();});
+    el.screen.querySelectorAll("[data-first]").forEach(b=>b.onclick=()=>{state.first=b.dataset.first;save();render();});
+    el.screen.querySelectorAll("[data-second]").forEach(b=>b.onclick=()=>{state.second=b.dataset.second;save();render();});
     const area=document.getElementById("pseudoActions");if(state.first&&state.second){const b=document.createElement("button");b.className="btn primary";b.textContent="GARDER CE PSEUDO";b.onclick=()=>evaluatePseudo();area.appendChild(b);}
   },
-  wait(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">EN ATTENTE</div><h2>${esc(state.pseudo)}</h2>${dialogue("MANU","Bouge pas.","manu")}<div class="sound-badge">STANDARD · PRODUCTION RÉELLE</div><p class="muted">Tu entends Manu gérer les lignes autour de toi. Boutons, souffle, voix dans le studio.</p><div class="choices">${choice("A","Oui.")}${choice("B","Évidemment.")}${choice("C","J’allais raccrocher.")}${choice("D","Je t’écoute.")}</div></div>`;playSfx("line");
+  wait(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">EN ATTENTE</div><h2>${esc(state.pseudo)}</h2>${dialogue("MANU","Bouge pas.","manu")}<div class="sound-badge">STANDARD · PRODUCTION RÉELLE</div><p class="muted">Tu entends Manu gérer les lignes autour de toi. Boutons, souffle, voix dans le studio.</p><div class="choices">${choice("A","Oui.")}${choice("B","Évidemment.")}${choice("C","J’allais raccrocher.")}${choice("D","Je t’écoute.")}</div></div>`;playSfx("line");setTimeout(()=>playSound("TEAM01",{wait:false}),100);
     bindChoices({A:async()=>{await playSfx("click");setScene("onair_intro","onair_intro");},B:async()=>{apply({standard:-1});await playSfx("click");setScene("onair_intro","onair_intro");},C:async()=>{apply({standard:-3});await playSound("TEAM02");await playSfx("click");setScene("onair_intro","onair_intro");},D:async()=>{apply({standard:2});await playSfx("click");setScene("onair_intro","onair_intro");}});
   },
   onair_intro(){state.clock="00:07";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker red">🔴 ON AIR</div><h2>Tu es à l’antenne.</h2>${audioChip("GG01","GÉRARD · DÉMARRAGE AUTHENTIQUE")}<p class="muted">Clique sur l’archive si tu veux réentendre son bonsoir avant de répondre.</p><div class="field-row"><label>TON ÂGE</label><input id="age" inputmode="numeric" maxlength="2" value="${esc(state.age)}" placeholder="ex. 23"></div><div class="field-row"><label>TA VILLE</label><input id="city" maxlength="40" value="${esc(state.city)}" placeholder="ex. Lyon"></div>${btn("RÉPONDRE",()=>{state.age=document.getElementById("age").value.trim()||"23";state.city=document.getElementById("city").value.trim()||"Lyon";save();setScene("frequency","frequency");})}</div>`;},
@@ -266,7 +327,7 @@ const scenes={
     bindChoices({A:async()=>{apply({gege:12,reputation:2,fun:state.technique?8:0});await playSound("GG04");if(state.technique)toast("Tu reformules sa logique sans la casser.");afterTony();},B:async()=>{apply({fun:5,gege:-9});await playSound("GG10");afterTony();},C:async()=>{apply({fun:11,reputation:7,gege:2});await playSound("GG05");if(!state.technique){state.technique=true;save();toast("TECHNIQUE COMPRISE · LE FAUX SOUTIEN");}afterTony();},D:()=>{apply({fun:1,gege:3});afterTony();}});
   },
   risk(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker red">ÇA VA PARTIR</div><h2>Gérard appelle le standard.</h2>${audioChip("EURO02","EXTRAIT AUTHENTIQUE · MONTÉE DE TENSION")}${audioChip("GG12")}${audioChip("GG13")}<p class="muted">Ta survie dépend désormais de la confiance que le standard t’accorde.</p>${btn("ÉCOUTER LA MONTÉE DE TENSION",async()=>{await playSound("EURO02");await sleep(180);await playSound("GG12");await sleep(220);await playSound("GG13");if(state.standard>=38){apply({standard:3,reputation:3});await playSound("GG09");toast("Manu garde ta ligne ouverte.");setScene("offair","offair");}else{await playSound("GG15");gerbe({reason:"Gérard a appelé le standard et Manu n’avait aucune raison de te protéger.",resume:"first_intervention",hard:true});}})}</div>`;},
-  offair(){state.clock="00:54";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">⚫ OFF AIR</div><h2>Pause disque.</h2><p>La voix de Gérard disparaît. D’un coup, tu n’entends plus que la ligne et le standard.</p><div class="sound-badge">MANU EST TOUJOURS LÀ</div>${dialogue("MANU","Pour une première, ça va. Mais le flingue pas en dix minutes.","manu")}<div class="choices">${choice("A","J’ai compris.")}${choice("B","Moi je veux surtout le faire gueuler.")}${choice("C","Qu’est-ce qui marche le mieux avec lui ?")}${choice("D","Tony, il fait comment ?")}</div></div>`;
+  offair(){state.clock="00:54";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">⚫ OFF AIR</div><h2>Pause disque.</h2><p>La voix de Gérard disparaît. D’un coup, tu n’entends plus que la ligne et le standard.</p><div class="sound-badge">MANU EST TOUJOURS LÀ</div>${dialogue("MANU","Pour une première, ça va. Mais le flingue pas en dix minutes.","manu")}<div class="choices">${choice("A","J’ai compris.")}${choice("B","Moi je veux surtout le faire gueuler.")}${choice("C","Qu’est-ce qui marche le mieux avec lui ?")}${choice("D","Tony, il fait comment ?")}</div></div>`;setTimeout(()=>playSound("TEAM04",{wait:false}),80);
     bindChoices({A:async()=>{apply({standard:4});await playSfx("click");setScene("return_air","return_air");},B:async()=>{apply({standard:-8});await playSound("TEAM03");setScene("return_air","return_air");},C:async()=>{apply({standard:6});state.tipStandard=true;save();await playSound("TEAM04");toast("CONSEIL DU STANDARD · NE CASSE PAS LE JEU");setScene("return_air","return_air");},D:()=>{apply({reputation:4});state.tonyFile=true;save();toast("DOSSIER TONY · VERROUILLÉ POUR PLUS TARD");setScene("return_air","return_air");}});
   },
   return_air(){state.clock="01:31";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker red">🔴 RETOUR ANTENNE</div>${audioChip("GG02")}<div class="montage"><span>00:57</span><span>01:14</span><span>01:31</span></div><p>Le débat continue. Tu as déjà survécu à ta première heure.</p>${btn("REPRENDRE LA LIGNE",async()=>{await playSound("GG02");setScene("last_test","last_test");})}</div>`;},
@@ -274,7 +335,7 @@ const scenes={
     bindChoices({A:async()=>{apply({gege:6,fun:-2});await playSound("GG03");finishTest();},B:async()=>{apply({fun:10,reputation:6,gege:2});await playSound("GG04");finishTest();},C:()=>{apply({fun:8,reputation:7});toast("Tu viens de faire un vrai rebond.");finishTest();},D:async()=>{apply({gege:-25,standard:-10});await playSound("GG10");if(state.gege<=0){await playSound("GG12");await playSound("GG13");await playSound("GG15");gerbe({reason:"Tu as tout fait exploser à deux minutes de la fin.",resume:"offair",hard:true});}else finishTest();}});
   },
   end_debate(){state.clock="01:59";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker red">FIN DU DÉBAT</div>${audioChip(state.gege<16?"GG16":"GG18")}<p>La ligne se vide. L’émission se termine.</p>${btn("QUITTER L’ANTENNE",async()=>{await playSound(state.gege<16?"GG16":"GG18");state.clock="02:01";save();setScene("callback");})}</div>`;},
-  callback(){const success=state.standard>=38&&state.fun>=12;const bland=state.standard>=38&&state.fun<12;el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">02:01</div><h2>${success?"Le téléphone sonne.":"Le téléphone reste silencieux."}</h2>${success?dialogue("MANU","C’était toi, "+esc(state.pseudo)+" ?<br><br>C’était pas mal.<br><br><strong>Rappelle jeudi prochain.</strong>","manu"):bland?`<p>Tu n’as rien fait de catastrophique. Mais personne ne se souvient vraiment de toi.</p>`:`<p>Le standard n’est pas encore convaincu.</p>`}${success?btn("VOIR LE BILAN",()=>{state.chapterComplete=true;save();setScene("summary");}):btn("RETENTER LE DÉBAT",()=>setScene(bland?"onair_intro":"pseudo",bland?"onair_intro":"pseudo"))}</div>`;},
+  callback(){const success=state.standard>=38&&state.fun>=12;const bland=state.standard>=38&&state.fun<12;el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">02:01</div><h2>${success?"Le téléphone sonne.":"Le téléphone reste silencieux."}</h2>${success?`${audioChip("TEAM01","MANU · INSERT AUTHENTIQUE")}<p>Le standard te rappelle. Manu te fait comprendre qu’il veut te revoir au prochain débat.</p><p class="big"><strong>Rappelle jeudi prochain.</strong></p>`:bland?`<p>Tu n’as rien fait de catastrophique. Mais personne ne se souvient vraiment de toi.</p>`:`<p>Le standard n’est pas encore convaincu.</p>`}${success?btn("VOIR LE BILAN",()=>{state.chapterComplete=true;save();setScene("summary");}):btn("RETENTER LE DÉBAT",()=>setScene(bland?"onair_intro":"pseudo",bland?"onair_intro":"pseudo"))}</div>`;if(success)setTimeout(()=>playSound("TEAM01",{wait:false}),80);},
   summary(){const reactions=Object.entries(state.reactions).sort((a,b)=>b[1]-a[1]).slice(0,4);el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">PREMIÈRE NUIT TERMINÉE</div><h1>JEUDI PROCHAIN</h1><p class="big">Trouve un autre pseudo.</p><div class="summary-grid"><div class="summary-item"><span>STANDARD</span><strong>${standardLabel()}</strong></div><div class="summary-item"><span>RÉPUTATION</span><strong>${reputationLabel()}</strong></div><div class="summary-item"><span>PSEUDO</span><strong>${esc(state.pseudo)}</strong></div><div class="summary-item"><span>TU AS GERBÉ</span><strong>${state.gerbes} fois</strong></div></div>${state.technique?`<div class="technique"><span class="eyebrow">TECHNIQUE ACQUISE</span><strong>LE FAUX SOUTIEN</strong></div>`:""}<h2 style="font-size:20px;margin-top:28px">Réactions authentiques les plus déclenchées</h2><div class="montage">${reactions.length?reactions.map(([id,n])=>`<span>${id} × ${n}</span>`).join(""):"<span>—</span>"}</div><p class="source-note">Archives sonores originales · chapitre L’Euro.</p>${btn("REJOUER CETTE NUIT",resetState)}</div>`;}
 };
 
@@ -291,11 +352,10 @@ function finishTest(){if(state.fun>=28&&state.gege>=30&&!(state.reactions.GG21>0
 
 el.screen.addEventListener("click",e=>{const b=e.target.closest("[data-audio]");if(b)playSound(b.dataset.audio);});
 
-initAudioBank();
 window.addEventListener("pointerdown",()=>{unlockAudio();},{once:true});
 window.addEventListener("keydown",()=>{unlockAudio();},{once:true});
 el.soundToggle.addEventListener("click",async()=>{if(!state.muted) stopAudio(); state.muted=!state.muted; if(!state.muted) await unlockAudio(); save();updateHUD();toast(state.muted?"Son coupé":"Son activé");});
-el.restartBtn.addEventListener("click",()=>modal({kicker:"RECOMMENCER",title:"Effacer la progression ?",text:"Tu recommenceras la nuit depuis 23:56.",actions:[{label:"ANNULER",className:"",onClick:()=>{}},{label:"RECOMMENCER",className:"danger",onClick:resetState}]}));
+el.restartBtn.addEventListener("click",()=>modal({kicker:"RECOMMENCER",title:"Repartir de zéro ?",text:"Toute la progression locale de cette partie sera effacée et tu reviendras à 23:56.",actions:[{label:"ANNULER",className:"",onClick:()=>{}},{label:"RECOMMENCER",className:"danger",onClick:resetState}]}));
 window.addEventListener("keydown",e=>{if(["A","B","C","D"].includes(e.key.toUpperCase()))el.screen.querySelector(`[data-choice="${e.key.toUpperCase()}"]`)?.click();});
 
 render();

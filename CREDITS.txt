@@ -1,0 +1,15 @@
+DEVENIR UN HABITUEL — VISUAL / AUDIO SOURCES
+
+AUDIO
+- Gérard / Manu / Phildar inserts: user-supplied inserts.zip originally sourced from GerardDeSuresnes.fr.
+- Debate master: 1999-01-07, Débat sur l'euro, user-supplied MP3.
+
+VISUALS USED ONLINE WITH LOCAL FALLBACKS
+- Telephone Headset.jpg — Panelxf — CC0 1.0 — Wikimedia Commons
+  https://commons.wikimedia.org/wiki/File:Telephone_Headset.jpg
+- Mixing console.jpg — Rodrigo César — Public Domain — Wikimedia Commons
+  https://commons.wikimedia.org/wiki/File:Mixing_console.jpg
+- Audio cassette tapes.jpg — Seth Ilys — Public Domain — Wikimedia Commons
+  https://commons.wikimedia.org/wiki/File:Audio_cassette_tapes.jpg
+
+Local SVG panels and waveform are project graphics; the waveform is derived from the supplied euro master audio.
