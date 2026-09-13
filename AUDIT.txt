@@ -1,0 +1,26 @@
+AUDIT PROTOTYPE v1.0 — 13/09/2026
+
+PÉRIMÈTRE
+Prologue + Émission 1 : L’Euro uniquement.
+
+CONTRÔLES EFFECTUÉS
+[OK] JavaScript : syntaxe validée par Node.
+[OK] 20 scènes définies ; toutes les références setScene() pointent vers une scène existante.
+[OK] 27 fichiers MP3 présents dans le ZIP ; 27/27 lisibles par ffprobe.
+[OK] 24 fichiers de Gérard comparés au pack source : identiques octet par octet.
+[OK] Aucun fichier audio requis n’est chargé depuis Internet.
+[OK] Aucun Math.random() dans la logique du jeu.
+[OK] Les mêmes choix produisent donc les mêmes scores, sons et embranchements.
+[OK] Sauvegarde localStorage après les décisions principales.
+[OK] Après une expulsion, le checkpoint est enregistré avant l’affichage de l’écran d’échec : recharger la page ne permet pas de contourner la sanction.
+[OK] Parcours de réussite possible : standard >= 38 et fun >= 12.
+[OK] Parcours de première expulsion à l’antenne atteignable via accumulation de mauvaises décisions.
+[OK] Responsive CSS prévu pour desktop, tablette et mobile <= 760 px / <= 420 px.
+[OK] Aucun visuel généré par IA ; interface entièrement HTML/CSS.
+[OK] Aucun clonage vocal / synthèse de Gérard.
+
+POINT VOLONTAIREMENT NON INCLUS
+Le master complet du débat sur l’Euro n’a pas été fourni avec les médias locaux. Cette version ne hotlinke pas le MP3 distant. La scène correspondante indique explicitement qu’elle utilise un insert authentique isolé. Elle pourra être remplacée sans modifier le moteur du jeu quand le master autorisé sera disponible.
+
+NOTE PUBLICATION
+Les fichiers audio proviennent du ZIP fourni par l’utilisateur. Avant publication publique sur GitHub Pages, vérifier que la republication de ces archives est autorisée par les ayants droit / la source.

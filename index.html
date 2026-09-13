@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b0d">
+  <title>Devenir un Habituel — L’Euro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span>DEVENIR UN HABITUEL</span>
+    </div>
+    <div class="top-actions">
+      <button id="soundToggle" class="icon-btn" type="button" aria-pressed="false" title="Couper le son">SON ◼</button>
+      <button id="restartBtn" class="icon-btn" type="button" title="Recommencer">↺</button>
+    </div>
+  </header>
+
+  <main id="app" class="app" aria-live="polite">
+    <section class="studio-shell">
+      <aside class="side-panel" aria-label="État de la ligne">
+        <div class="clock-card">
+          <span class="eyebrow">HEURE</span>
+          <strong id="clock">23:56</strong>
+        </div>
+
+        <div class="line-card">
+          <div class="line-row"><span>STANDARD</span><strong id="standardStatus">INCONNU</strong></div>
+          <div class="line-row"><span>GÉRARD</span><strong id="gegeStatus">—</strong></div>
+          <div class="line-row"><span>RÉPUTATION</span><strong id="reputationStatus">—</strong></div>
+          <div class="line-row"><span>GERBES</span><strong id="gerbesCount">0</strong></div>
+        </div>
+
+        <div class="onair-box" id="onairBox">
+          <span class="onair-led" aria-hidden="true"></span>
+          <span id="onairText">HORS LIGNE</span>
+        </div>
+
+        <div class="wave" id="wave" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+      </aside>
+
+      <section class="main-panel">
+        <div id="screen" class="screen"></div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-kicker" id="modalKicker"></div>
+      <h2 id="modalTitle"></h2>
+      <p id="modalText"></p>
+      <div id="modalActions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
