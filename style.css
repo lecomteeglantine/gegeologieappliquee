@@ -312,3 +312,36 @@ body{
 .scene-visual.photo img{object-fit:cover;filter:saturate(.78) contrast(1.12) sepia(.12) brightness(.88)}
 .scene-visual.photo::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 50% 45%,transparent 45%,rgba(0,0,0,.34) 100%)}
 .scene-visual.vector img{filter:none}
+
+/* v1.4 — reliable tap-to-play audio + authentic archive photo grid */
+.scene-media{display:block;width:100%;margin:0 0 24px}
+.scene-media-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.scene-media-grid .scene-visual{margin:0;height:220px}
+.audio-gate{margin:18px 0 22px}
+.audio-gate-btn{
+  width:100%;display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;
+  border:1px solid #56606d;background:linear-gradient(180deg,#20252d,#15191e);color:#f3f5f7;
+  padding:15px 16px;border-radius:12px;cursor:pointer;text-align:left;box-shadow:0 10px 28px rgba(0,0,0,.24)
+}
+.audio-gate-btn:hover{border-color:#8dffab;background:#202a25}
+.audio-gate-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.audio-gate-btn.is-playing{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset,0 12px 30px rgba(0,0,0,.28)}
+.audio-gate-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#8dffab;color:#0d1510;font-size:18px;font-weight:900}
+.audio-gate-btn strong{display:block;color:#fff;font-size:14px;letter-spacing:.04em}
+.audio-gate-btn small{display:block;color:#aeb6c0;font-size:12px;margin-top:4px;line-height:1.35}
+.audio-locked{border:1px dashed #39414b;border-radius:10px;padding:12px 14px;background:#0d1014}
+.native-audio-fallback{width:100%;margin-top:12px;display:block}
+.audio-chip.is-playing{border-color:var(--green)!important;box-shadow:0 0 0 1px var(--green) inset}
+.scene-media-grid .scene-visual figcaption{max-width:92%;white-space:normal;line-height:1.25}
+
+@media(max-width:760px){
+  .scene-media-grid{grid-template-columns:1fr;gap:9px}
+  .scene-media-grid .scene-visual{height:180px}
+  .scene-media{margin-bottom:18px}
+  .audio-gate-btn{grid-template-columns:42px 1fr;padding:13px}
+  .audio-gate-icon{width:38px;height:38px}
+}
+@media(max-width:430px){
+  .scene-media-grid .scene-visual{height:155px}
+  .audio-gate-btn strong{font-size:13px}
+}

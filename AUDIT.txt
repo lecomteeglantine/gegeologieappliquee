@@ -1,29 +1,25 @@
-AUDIT v1.3
+AUDIT v1.4
 
 AUDIO
-- Audio engine switched to Web Audio API after one user gesture; local MP3s decoded and cached.
-- Fallback to HTMLAudioElement if decoding fails.
-- Manu's verified insert "On accueille tu le reprends..." is triggered automatically at the standard and remains replayable.
-- Additional authentic Manu inserts used as feedback.
-- 30 local MP3 files probed successfully.
+- Suppression de l'autoplay : Chrome/mobile peut le bloquer par conception.
+- Les archives essentielles sont maintenant lancées UNIQUEMENT par un clic/tap direct sur ▶.
+- Lecture via HTMLAudioElement natif plutôt que fetch + AudioContext pour les voix/archives.
+- Si .play() est refusé malgré le tap, apparition d'un lecteur <audio controls> natif en secours.
+- Le bouton son affiche explicitement SON : ON / SON : OFF.
+- Nouvelle clé de sauvegarde v1.4 : les réglages audio cassés de versions précédentes ne sont pas repris.
 
-RESET
-- Visible "REPARTIR DE ZÉRO" button in the header.
-- Reset removes current and earlier local-save keys and returns to 23:56.
+VISUELS
+- Standard : vraies archives de studio MisterCouzin (2006) + fallback local.
+- Scène liée à Manu : archive provenant d'une page dédiée à Manu + vraie photo de studio en parallèle.
+- Direct / pause / bilan : davantage d'archives de studio et d'équipe.
+- Les photos 2006 sont explicitement datées pour ne pas les faire passer pour des images du débat 1999.
 
-SMARTPHONE
-- Main game moves above the status HUD on screens <=760 px.
-- Tested layouts at 390x844 and 360x740: document width equals viewport width, no horizontal overflow.
-- Touch choices >=62 px high; inputs use 16 px font to avoid iOS auto-zoom.
+MOBILE
+- Grille de deux photos repasse sur une colonne sous 760 px.
+- Boutons et lecteurs audio tactiles pleine largeur.
+- Pas de dépendance au survol.
 
-VISUALS
-- Every playable scene now contains its own visible illustration/card.
-- Standard, studio and pause scenes use public-domain / CC0 archive-style photographs from Wikimedia Commons with local SVG fallbacks.
-- Pseudo and euro scenes use local bespoke vector panels.
-- Remote images are non-essential; the game remains usable if Wikimedia is unavailable.
-
-CODE / ASSETS
-- JavaScript syntax checked with node --check.
-- Every local media reference exists.
-- Every setScene target maps to a defined scene.
-- No random number usage.
+STABILITÉ
+- Aucun autoplay obligatoire.
+- Aucun écran ne dépend d'un média distant pour continuer : chaque photo a un fallback local.
+- Aucun son n'est requis pour éviter un soft-lock : le fallback natif permet de poursuivre.

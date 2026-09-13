@@ -1,15 +1,18 @@
-DEVENIR UN HABITUEL — VISUAL / AUDIO SOURCES
+DEVENIR UN HABITUEL — v1.4 — SOURCES VISUELLES / SONORES
 
-AUDIO
-- Gérard / Manu / Phildar inserts: user-supplied inserts.zip originally sourced from GerardDeSuresnes.fr.
-- Debate master: 1999-01-07, Débat sur l'euro, user-supplied MP3.
+SONS
+- Inserts authentiques fournis par l'utilisateur via inserts.zip, issus des archives GerardDeSuresnes.fr.
+- Master du débat sur l'euro du 07/01/1999 fourni par l'utilisateur ; deux extraits locaux sont intégrés au jeu.
 
-VISUALS USED ONLINE WITH LOCAL FALLBACKS
-- Telephone Headset.jpg — Panelxf — CC0 1.0 — Wikimedia Commons
-  https://commons.wikimedia.org/wiki/File:Telephone_Headset.jpg
-- Mixing console.jpg — Rodrigo César — Public Domain — Wikimedia Commons
-  https://commons.wikimedia.org/wiki/File:Mixing_console.jpg
-- Audio cassette tapes.jpg — Seth Ilys — Public Domain — Wikimedia Commons
-  https://commons.wikimedia.org/wiki/File:Audio_cassette_tapes.jpg
+PHOTOS / ARCHIVES VISUELLES DISTANTES
+- MisterCouzin, dossier de la soirée hommage du 20 avril 2006 :
+  derriere_la_vitre2.jpg
+  photo_pancho1.JPG
+  toute_la_bande.jpg
+  https://www.mistercouzin.net/FTP/upload/soiree_hommage_du_20_Avril_2006/
+- Archive publiée sur la page "Manu" du site Max de Fun :
+  https://maxdefun.e-monsite.com/pages/manu.html
+  (le jeu la présente comme une archive liée à cette page, sans identifier les personnes visibles sur l'image.)
 
-Local SVG panels and waveform are project graphics; the waveform is derived from the supplied euro master audio.
+REMARQUE
+Les photos MisterCouzin utilisées ici datent du dossier hommage 2006. Elles servent d'archives d'ambiance studio/équipe et ne sont pas présentées comme des photos prises pendant le débat Euro de 1999.
