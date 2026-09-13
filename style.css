@@ -345,3 +345,42 @@ body{
   .scene-media-grid .scene-visual{height:155px}
   .audio-gate-btn strong{font-size:13px}
 }
+
+/* v1.5 — Manu photo local + audio embedded in page */
+.scene-visual.portrait{
+  background:linear-gradient(145deg,#2a251f,#0f1114);
+  border-color:#5a4a38;
+}
+.scene-visual.portrait img{
+  object-fit:contain;
+  object-position:center center;
+  background:radial-gradient(circle at 50% 35%,#3a3026 0,#17191c 66%,#0d0f12 100%);
+  filter:none;
+  padding:8px;
+}
+.scene-visual.portrait::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  box-shadow:inset 0 0 42px rgba(0,0,0,.42);
+}
+.native-player-card{
+  margin:12px 0 20px;padding:12px 14px;border:1px solid #3e4651;border-radius:12px;
+  background:linear-gradient(180deg,#15191f,#0e1115);
+}
+.native-player-card>span,.audio-help{
+  display:block;color:#aab2bc;font-size:10px;font-weight:900;letter-spacing:.13em;margin-bottom:8px
+}
+.native-player-card audio,.native-audio-fallback{width:100%;min-height:42px;display:block}
+.audio-gate-fallback{margin-top:10px}
+.scene-media-grid .scene-visual.portrait{height:260px}
+.scene-media-grid .scene-visual.vector{height:260px}
+
+@media(max-width:760px){
+  .scene-media-grid .scene-visual.portrait,
+  .scene-media-grid .scene-visual.vector{height:210px}
+  .scene-visual.portrait img{padding:5px}
+  .native-player-card{padding:10px}
+}
+@media(max-width:430px){
+  .scene-media-grid .scene-visual.portrait,
+  .scene-media-grid .scene-visual.vector{height:190px}
+}

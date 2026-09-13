@@ -31,7 +31,14 @@ const AUDIO = {
   EURO02:["assets/audio/euro/euro02_montee_tension.mp3","Extrait authentique · débat sur l’euro · montée de tension"],
 };
 
-const SAVE_KEY = "devenirHabituel_euro_v14";
+// v1.5: use embedded audio data first, local MP3 paths remain as a backup.
+if(window.EMBEDDED_AUDIO){
+  Object.entries(AUDIO).forEach(([id,meta])=>{
+    if(window.EMBEDDED_AUDIO[id]) meta[0]=window.EMBEDDED_AUDIO[id];
+  });
+}
+
+const SAVE_KEY = "devenirHabituel_euro_v15";
 const DEFAULT = {
   scene:"intro",
   checkpoint:"intro",
@@ -88,7 +95,7 @@ function loadState(){
 }
 function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));}
 function resetState(){
-  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14"].forEach(k=>localStorage.removeItem(k));
+  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15"].forEach(k=>localStorage.removeItem(k));
   state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast("Progression remise à zéro.");
 }
 function setScene(scene, checkpoint){state.scene=scene;if(checkpoint)state.checkpoint=checkpoint;save();render();}
@@ -216,11 +223,22 @@ function audioGate(id,label,next){
   const a=AUDIO[id];
   const gate=document.createElement('div');
   gate.className='audio-gate';
-  gate.innerHTML=`<button type="button" class="audio-gate-btn"><span class="audio-gate-icon">▶</span><span><strong>${esc(label)}</strong><small>${esc(a?.[1]||'Archive authentique')}</small></span></button>`;
+  gate.innerHTML=`<button type="button" class="audio-gate-btn"><span class="audio-gate-icon">▶</span><span><strong>${esc(label)}</strong><small>${esc(a?.[1]||'Archive authentique')}</small></span></button><div class="audio-gate-fallback"></div>`;
   const b=gate.querySelector('button');
   b.addEventListener('click',async()=>{
     const ok=await playSound(id,{button:b});
-    if(typeof next==='function' && (ok || host.querySelector('.native-audio-fallback'))) next();
+    if(ok){
+      if(typeof next==='function') next();
+      return;
+    }
+    // Never block the game because of browser audio policy.
+    const fb=gate.querySelector('.audio-gate-fallback');
+    if(fb && !fb.querySelector('audio')){
+      fb.innerHTML=`<p class="audio-help">Si le bouton vert reste muet, utilise ce lecteur natif :</p><audio class="native-audio-fallback" controls preload="metadata" playsinline src="${AUDIO[id][0]}"></audio>`;
+      const native=fb.querySelector('audio');
+      native.addEventListener('play',()=>{if(typeof next==='function') next();},{once:true});
+    }
+    if(typeof next==='function') next();
   });
   return gate;
 }
@@ -245,28 +263,28 @@ function updateVisual(){
 }
 
 function sceneArtFor(scene){
-  const fallbackStandard="assets/images/standard.svg";
-  const archiveStudio="https://www.mistercouzin.net/FTP/upload/soiree_hommage_du_20_Avril_2006/derriere_la_vitre2.jpg";
-  const archiveStudio2="https://www.mistercouzin.net/FTP/upload/soiree_hommage_du_20_Avril_2006/photo_pancho1.JPG";
-  const archiveTeam="https://www.mistercouzin.net/FTP/upload/soiree_hommage_du_20_Avril_2006/toute_la_bande.jpg";
-  const manuArchive="https://s1.e-monsite.com/2008/07/13/39588114untitled-jpg.jpg";
-  if(["intro","busy1","busy2","callback"].includes(scene))return [{src:"assets/images/bedroom.svg",caption:"Ton téléphone · jeudi soir",fallback:"assets/images/bedroom.svg",kind:"vector"}];
+  const standard="assets/images/standard.svg";
+  const manu="assets/images/manu.png";
+  if(["intro","busy1","busy2","callback"].includes(scene))return [{src:"assets/images/bedroom.svg",caption:"Ton téléphone · jeudi soir",kind:"vector"}];
   if(scene==="manu_intro")return [
-    {src:manuArchive,caption:"Archive liée à Manu · page Max de Fun",fallback:fallbackStandard,kind:"photo"},
-    {src:archiveStudio,caption:"Studio / standard · archive MisterCouzin · 2006",fallback:fallbackStandard,kind:"photo"}
+    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"},
+    {src:standard,caption:"LE STANDARD · LIGNES AUDITEURS",kind:"vector"}
   ];
   if(["audition","wait"].includes(scene))return [
-    {src:archiveStudio2,caption:"Studio radio · archive MisterCouzin · 2006",fallback:fallbackStandard,kind:"photo"},
-    {src:archiveStudio,caption:"Derrière la vitre · archive MisterCouzin · 2006",fallback:fallbackStandard,kind:"photo"}
+    {src:manu,caption:"MANU · STANDARD / RÉA",kind:"portrait"},
+    {src:standard,caption:"LE STANDARD · TU ES EN ATTENTE",kind:"vector"}
   ];
-  if(scene==="pseudo")return [{src:"assets/images/pseudo.svg",caption:"Le cahier du standard · trouve ton blaze",fallback:"assets/images/pseudo.svg",kind:"vector"}];
-  if(scene==="offair")return [{src:archiveStudio,caption:"Pause / studio · archive MisterCouzin",fallback:"assets/images/offair.svg",kind:"photo"}];
-  if(scene==="summary")return [{src:archiveTeam,caption:"Photo d’équipe · archive MisterCouzin · 2006",fallback:"assets/images/summary.svg",kind:"photo"}];
+  if(scene==="pseudo")return [{src:"assets/images/pseudo.svg",caption:"LE CAHIER DU STANDARD · TROUVE TON BLAZE",kind:"vector"}];
+  if(scene==="offair")return [
+    {src:manu,caption:"MANU · HORS ANTENNE",kind:"portrait"},
+    {src:"assets/images/offair.svg",caption:"PAUSE DISQUE · MICRO COUPÉ",kind:"vector"}
+  ];
+  if(scene==="summary")return [{src:"assets/images/summary.svg",caption:"BILAN DE LA NUIT",kind:"vector"}];
   if(["first_intervention","micro_archive","understood","last_test"].includes(scene))return [
-    {src:"assets/images/euro.svg",caption:"Le débat sur l’euro · 07/01/1999",fallback:"assets/images/euro.svg",kind:"vector"},
-    {src:archiveStudio,caption:"Studio · archive MisterCouzin",fallback:"assets/images/onair.svg",kind:"photo"}
+    {src:"assets/images/euro.svg",caption:"DÉBAT SUR L’EURO · 07/01/1999",kind:"vector"},
+    {src:"assets/images/onair.svg",caption:"STUDIO · DIRECT",kind:"vector"}
   ];
-  return [{src:archiveStudio,caption:"Studio radio · archive MisterCouzin",fallback:"assets/images/onair.svg",kind:"photo"}];
+  return [{src:"assets/images/onair.svg",caption:"STUDIO · DIRECT",kind:"vector"}];
 }
 function decorateScene(){
   const sceneEl=el.screen.querySelector(".scene");
@@ -276,15 +294,8 @@ function decorateScene(){
   wrap.className=`scene-media ${items.length>1?'scene-media-grid':''}`;
   items.forEach(item=>{
     const fig=document.createElement('figure');
-    fig.className=`scene-visual ${item.kind==="photo"?"photo":"vector"}`;
-    fig.innerHTML=`<img src="${item.src}" alt="" referrerpolicy="no-referrer"><figcaption>${esc(item.caption)}</figcaption>`;
-    const img=fig.querySelector('img');
-    img.addEventListener('error',()=>{
-      if(img.dataset.failed==='1')return;
-      img.dataset.failed='1';
-      img.src=item.fallback;
-      fig.classList.remove('photo');fig.classList.add('vector');
-    });
+    fig.className=`scene-visual ${item.kind||'vector'}`;
+    fig.innerHTML=`<img src="${item.src}" alt=""><figcaption>${esc(item.caption)}</figcaption>`;
     wrap.appendChild(fig);
   });
   sceneEl.prepend(wrap);
@@ -305,12 +316,10 @@ const scenes={
   intro(){state.clock="23:56";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">AUDIO · LES ARCHIVES SE LANCENT AVEC ▶</div>${btn("☎ APPELER LE STANDARD",async()=>{await playSfx("click");setScene("busy1","intro");})}</div>`;},
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   busy2(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 02</div><h2>Toujours occupé.</h2><p class="muted">Tu raccroches. Tu recomposes.</p>${btn("RAPPELER",async()=>{await playSfx("ring");await playSfx("click");setScene("manu_intro");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
-  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">MANU · ARCHIVE AUTHENTIQUE</div><h2>Écoute d’abord le standard.</h2><p>Appuie sur le bouton pour ouvrir la ligne : <strong>tu entends d’abord une vraie archive de Manu</strong>, puis les choix apparaissent.</p><div id="manuGate"></div><div id="manuAfter" class="audio-locked"><p class="muted">Écoute l’archive pour débloquer les réponses.</p></div></div>`;
+  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">MANU · ARCHIVE AUTHENTIQUE</div><h2>Manu te prend au standard.</h2><p>Le standard décroche. <strong>Déclenche toi-même l’archive authentique de Manu</strong>, ou utilise le lecteur direct juste dessous.</p><div id="manuGate"></div><div class="native-player-card"><span>OU LECTEUR DIRECT</span><audio id="manuNative" controls preload="metadata" playsinline src="${AUDIO.TEAM04[0]}"></audio></div>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
     const host=document.getElementById("manuGate");
-    host.appendChild(audioGate("TEAM04","▶ ÉCOUTER MANU AU STANDARD",()=>{
-      document.getElementById("manuAfter").innerHTML=`${dialogue("LE STANDARD","Manu te prend sur la ligne. Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div>`;
-      bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
-    }));
+    host.appendChild(audioGate("TEAM04","▶ ÉCOUTER MANU AU STANDARD"));
+    bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
   },
   audition(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">AUDITION DU STANDARD</div>${dialogue("MANU","Pourquoi je te passe ?","manu")}<div class="choices">${choice("A","Parce que Gérard est nul.")}${choice("B","J’ai vraiment un avis sur l’euro.")}${choice("C","Je voulais savoir si les billets de Monopoly allaient aussi passer à l’euro.")}${choice("D","Passe-moi et tu verras.")}</div></div>`;
     bindChoices({A:async()=>{apply({standard:-7});await playSound("TEAM02");gerbe({reason:"Le standard cherchait quelqu’un capable de jouer, pas seulement d’insulter.",resume:"manu_intro"});},B:()=>{apply({standard:3,fun:-1});setScene("pseudo","pseudo");},C:async()=>{apply({standard:10,fun:7});await playSound("TEAM04");toast("Manu a ri.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-3});if(state.standard<25){await playSound("TEAM02");gerbe({reason:"Tu as joué au mystérieux un peu trop tôt.",resume:"manu_intro"});}else setScene("pseudo","pseudo");}});

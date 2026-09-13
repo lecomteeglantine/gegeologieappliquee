@@ -1,14 +1,14 @@
-DEVENIR UN HABITUEL — L'EURO — v1.3
+DEVENIR UN HABITUEL — L'EURO — v1.5
 
 CORRECTIONS PRINCIPALES
-- Manu est maintenant réellement entendu : son insert authentique du standard se déclenche automatiquement et reste réécoutable.
-- Moteur audio refait avec Web Audio API après le premier geste utilisateur, avec fallback HTMLAudio.
-- Bouton visible REPARTIR DE ZÉRO.
-- Mise en page smartphone retravaillée et testée à 390x844 et 360x740 sans débordement horizontal.
-- Illustrations visibles directement dans chaque scène.
-- Photos domaine public / CC0 utilisées pour standard, console et cassette, avec SVG locaux en fallback.
-- 2 extraits authentiques du master du débat sur l'euro intégrés.
+- Photo de Manu fournie par l'utilisateur intégrée localement dans le site.
+- Aucune image distante indispensable : plus de photo cassée ni de photo de groupe ambiguë au standard.
+- Audio critique embarqué directement dans audio-data.js en plus des MP3 locaux.
+- Le lecteur natif de Manu est toujours visible : aucun autoplay nécessaire.
+- Les choix ne sont plus bloqués si un navigateur refuse une lecture audio.
+- REPARTIR DE ZÉRO reste disponible en permanence.
+- Responsive smartphone conservé.
 
-INSTALLATION
-Dézipper et envoyer tous les fichiers directement à la racine du repository GitHub Pages, en remplaçant les anciens fichiers.
-Après déploiement, faire Ctrl+F5 sur ordinateur ou recharger complètement la page sur smartphone.
+MISE EN LIGNE
+Décompresser le ZIP et remplacer tout le contenu du repository GitHub Pages par son contenu.
+Après déploiement, faire Ctrl+F5 sur ordinateur ou fermer/réouvrir l'onglet sur smartphone.
