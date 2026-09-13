@@ -1,0 +1,7 @@
+v2.0 — Correctif médias embarqués
+
+- toutes les images de scène sont maintenant embarquées dans image-data.js ;
+- tous les MP3 présents sont ré-embarqués dans audio-data.js, y compris TEAM06 et TEAM07 ;
+- les chemins assets restent en secours, mais le jeu ne dépend plus d’eux pour afficher les images / lire les sons ;
+- nouvelle clé de sauvegarde v2.0 ;
+- objectif : supprimer les images brisées vues sur GitHub Pages.

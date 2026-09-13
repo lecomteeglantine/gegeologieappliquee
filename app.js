@@ -41,8 +41,8 @@ if(window.EMBEDDED_AUDIO){
   });
 }
 
-const SAVE_KEY = "devenirHabituel_euro_v19";
-const META_KEY = "devenirHabituel_euro_meta_v19";
+const SAVE_KEY = "devenirHabituel_euro_v20";
+const META_KEY = "devenirHabituel_euro_meta_v20";
 const DEFAULT = {
   scene:"intro",
   checkpoint:"intro",
@@ -119,7 +119,7 @@ function currentManuIntroAudio(){return currentRunCount()%2===1?"TEAM06":"TEAM07
 function currentManuIntroLine(){return currentRunCount()%2===1?"Oui, vous êtes sur Fun.":"Bonsoir, tu veux parler de quoi ?";}
 function currentManuIntroLabel(){return currentRunCount()%2===1?"▶ ÉCOUTER MANU : « OUI, VOUS ÊTES SUR FUN »":"▶ ÉCOUTER MANU : « BONSOIR, TU VEUX PARLER DE QUOI ? »";}
 function resetState(){
-  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17","devenirHabituel_euro_v18"].forEach(k=>localStorage.removeItem(k));
+  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17","devenirHabituel_euro_v18","devenirHabituel_euro_v19"].forEach(k=>localStorage.removeItem(k));
   incrementRunCount();
   state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast(`Progression remise à zéro. Piste Manu n°${currentRunCount()%2===1?1:2} pour cette partie.`);
 }
@@ -287,6 +287,11 @@ function updateVisual(){
   else el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="assets/images/onair.svg" alt="">${wave}<div class="visual-caption red">STUDIO · DIRECT</div><div class="info-pill red">MASTER EURO · ARCHIVES AUTHENTIQUES</div></div>`;
 }
 
+function imageSrc(path){
+  const name=path.split('/').pop();
+  return (window.EMBEDDED_IMAGES&&window.EMBEDDED_IMAGES[name])||path;
+}
+
 function sceneArtFor(scene){
   const standard="assets/images/standard90s.svg";
   const desk="assets/images/standard-desk-poster.jpg";
@@ -345,7 +350,7 @@ function decorateScene(){
   items.forEach(item=>{
     const fig=document.createElement('figure');
     fig.className=`scene-visual ${item.kind||'vector'}`;
-    fig.innerHTML=`<img src="${item.src}" alt=""><figcaption>${esc(item.caption)}</figcaption>`;
+    fig.innerHTML=`<img src="${imageSrc(item.src)}" alt=""><figcaption>${esc(item.caption)}</figcaption>`;
     wrap.appendChild(fig);
   });
   sceneEl.prepend(wrap);
