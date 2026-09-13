@@ -214,3 +214,26 @@ body{
 .audio-chip.audio-play{width:100%;text-align:left;cursor:pointer;font:inherit;color:#cdd3da}
 .audio-chip.audio-play:hover{border-color:#777f89;background:#181d23}
 .audio-chip.audio-play em{margin-left:auto;font-style:normal;color:#ffc45d;font-size:12px}
+
+/* v1.2 — local illustrated panels + stronger audio affordances */
+.visual-layer{
+  min-height:290px;
+  background:linear-gradient(180deg,#2a2420,#121419 74%,#0d0f13);
+}
+.art-stage{position:absolute;inset:0;overflow:hidden}
+.artwork{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.06) contrast(1.03)}
+.wave-strip{position:absolute;left:22px;right:22px;bottom:18px;height:54px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:rgba(10,14,18,.78);box-shadow:0 12px 24px rgba(0,0,0,.35)}
+.wave-strip img{width:100%;height:100%;object-fit:cover;display:block;opacity:.92}
+.info-pill{position:absolute;right:16px;top:14px;z-index:10;font-size:10px;font-weight:900;letter-spacing:.14em;color:#f4deb1;background:#181819d8;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 10px;text-transform:uppercase}
+.info-pill.red{color:#ffb7af}
+.screen{background:linear-gradient(180deg,rgba(10,11,14,.26),rgba(10,11,14,.06))}
+.sound-badge{font-size:11px;letter-spacing:.12em}
+.audio-chip strong{min-width:max-content}
+.audio-chip span{flex:1}
+.scene .audio-chip + p.muted{margin-top:4px}
+
+@media(max-width:760px){
+  .visual-layer{min-height:250px}
+  .wave-strip{left:12px;right:12px;bottom:12px;height:46px}
+  .info-pill{top:auto;right:12px;bottom:66px;font-size:9px;padding:6px 8px;max-width:54%;text-align:right}
+}
