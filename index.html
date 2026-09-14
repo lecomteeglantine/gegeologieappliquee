@@ -491,7 +491,7 @@ body{
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
-      <span>DEVENIR UN HABITUEL <small class="version">v2.4</small></span>
+      <span>DEVENIR UN HABITUEL <small class="version">v2.5</small></span>
     </div>
     <div class="top-actions">
       <button id="soundToggle" class="icon-btn" type="button" aria-pressed="false" title="Couper le son">SON ◼</button>
@@ -651,7 +651,7 @@ if(window.EMBEDDED_AUDIO){
   });
 }
 
-const SAVE_KEY = "devenirHabituel_euro_v24";
+const SAVE_KEY = "devenirHabituel_euro_v25";
 const META_KEY = "devenirHabituel_euro_meta_v21";
 const DEFAULT = {
   scene:"intro",
@@ -725,9 +725,9 @@ function incrementRunCount(){
   return meta.runCount;
 }
 function currentRunCount(){return loadMeta().runCount||1;}
-function currentManuIntroAudio(){return currentRunCount()%2===1?"TEAM06":"TEAM07";}
-function currentManuIntroLine(){return currentRunCount()%2===1?"Oui, vous êtes sur Fun.":"Bonsoir, tu veux parler de quoi ?";}
-function currentManuIntroLabel(){return currentRunCount()%2===1?"▶ ÉCOUTER MANU : « OUI, VOUS ÊTES SUR FUN »":"▶ ÉCOUTER MANU : « BONSOIR, TU VEUX PARLER DE QUOI ? »";}
+function currentManuIntroAudio(){return "TEAM06";}
+function currentManuIntroLine(){return "Oui, vous êtes sur Fun.";}
+function currentManuIntroLabel(){return "▶ ÉCOUTER MANU : « OUI, VOUS ÊTES SUR FUN »";}
 function resetState(){
   ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17","devenirHabituel_euro_v18","devenirHabituel_euro_v19"].forEach(k=>localStorage.removeItem(k));
   incrementRunCount();
@@ -956,13 +956,25 @@ function gerbe({reason="Le standard a coupé ta ligne.",resume="intro",hard=fals
   stopAudio();state.gerbes++;state.scene=resume;state.checkpoint=resume;save();updateHUD();
   modal({kicker:"STANDARD",title:"TU GERBES AU STANDARD",text:reason,actions:[{label:hard?"REPRENDRE AU DÉBUT DU DÉBAT":"RAPPELER",onClick:()=>setScene(resume,resume)}]});
 }
+
+let introArchivePlayed=false;
+async function playIntroArchiveOnce(){
+  if(introArchivePlayed||state.muted||state.scene!=="intro")return;
+  introArchivePlayed=true;
+  try{await playSound("TEAM07",{wait:false});}
+  catch(e){introArchivePlayed=false;}
+}
+window.addEventListener("pointerdown",()=>{if(state.scene==="intro"&&!introArchivePlayed)playIntroArchiveOnce();},{once:true});
+
 function render(){stopAudio();updateHUD();updateVisual();const fn=scenes[state.scene]||scenes.intro;fn();decorateScene();}
 
 const scenes={
-  intro(){state.clock="23:56";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">AUDIO · LES ARCHIVES SE LANCENT AVEC ▶</div>${btn("☎ APPELER LE STANDARD",async()=>{await playSfx("click");setScene("busy1","intro");})}</div>`;},
+  intro(){state.clock="23:56";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">ARCHIVE STANDARD · LANCEMENT AUTOMATIQUE</div><p class="muted">Si Chrome bloque le son à l'ouverture, le premier clic sur la page le déclenche automatiquement.</p>${btn("☎ APPELER LE STANDARD",async()=>{await playSfx("click");setScene("busy1","intro");})}</div>`;
+    setTimeout(()=>playIntroArchiveOnce(),180);
+  },
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   busy2(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 02</div><h2>Toujours occupé.</h2><p class="muted">Tu raccroches. Tu recomposes.</p>${btn("RAPPELER",async()=>{await playSfx("ring");await playSfx("click");setScene("manu_intro");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
-  manu_intro(){state.clock="23:58";save();updateHUD();const manuIntroAudio=currentManuIntroAudio();const manuIntroLine=currentManuIntroLine();const manuIntroLabel=currentManuIntroLabel();const manuVariant=currentRunCount()%2===1?1:2;el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">MANU · ARCHIVE AUTHENTIQUE · PISTE ${manuVariant}/2</div><h2>Manu te prend au standard.</h2><p>Le jeu alterne maintenant entre deux accroches de standard selon le nombre de fois où l’on relance la partie.</p><p><strong>Accroche utilisée pour cette partie :</strong> « ${manuIntroLine} »</p><p class="muted">Et visuellement, tu arrives maintenant dans un vrai standard radio de nuit : téléphone fixe, casque, CRT, cahier d’appels.</p><div id="manuGate"></div><div class="native-player-card"><span>OU LECTEUR DIRECT</span><audio id="manuNative" controls preload="metadata" playsinline src="${AUDIO[manuIntroAudio][0]}"></audio></div>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
+  manu_intro(){state.clock="23:58";save();updateHUD();const manuIntroAudio=currentManuIntroAudio();const manuIntroLine=currentManuIntroLine();const manuIntroLabel=currentManuIntroLabel();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">MANU · ARCHIVE AUTHENTIQUE</div><h2>Manu te prend au standard.</h2><p><strong>Archive utilisée ici :</strong> « ${manuIntroLine} »</p><p class="muted">L'extrait « Bonsoir, tu veux parler de quoi ? » n'est plus simulé ici : il sera remplacé uniquement par le vrai passage d'archive.</p><div id="manuGate"></div><div class="native-player-card"><span>OU LECTEUR DIRECT</span><audio id="manuNative" controls preload="metadata" playsinline src="${AUDIO[manuIntroAudio][0]}"></audio></div>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
     const host=document.getElementById("manuGate");
     host.appendChild(audioGate(manuIntroAudio,manuIntroLabel));
     bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
@@ -1027,5 +1039,6 @@ window.addEventListener("keydown",e=>{if(["A","B","C","D"].includes(e.key.toUppe
 render();
 
 </script>
+<!-- v2.5: TEAM07 moved to intro ambience. Exact "Bonsoir, tu veux parler de quoi ?" source identified in 20000831 debate, not falsely labelled in-game until exact clip is cut. -->
 </body>
 </html>
