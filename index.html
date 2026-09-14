@@ -491,7 +491,7 @@ body{
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
-      <span>DEVENIR UN HABITUEL <small class="version">v2.5</small></span>
+      <span>DEVENIR UN HABITUEL <small class="version">v2.6</small></span>
     </div>
     <div class="top-actions">
       <button id="soundToggle" class="icon-btn" type="button" aria-pressed="false" title="Couper le son">SON ◼</button>
@@ -642,6 +642,10 @@ const AUDIO = {
   TEAM05:["assets/audio/team/team05.mp3","Manu — On accueille, tu le reprends…"],
   EURO01:["assets/audio/euro/euro01_faux_serieux.mp3","Extrait authentique · débat sur l’euro · faux sérieux"],
   EURO02:["assets/audio/euro/euro02_montee_tension.mp3","Extrait authentique · débat sur l’euro · montée de tension"],
+  JINGLE_GERARD_1:["https://www.schoop.fr/sons/mp3/max6.mp3","Les débats de Gérard · jingle 1/3"],
+  JINGLE_GERARD_2:["https://www.schoop.fr/sons/mp3/max5.mp3","Les débats de Gérard · jingle 2/3"],
+  JINGLE_GERARD_3:["https://www.schoop.fr/sons/mp3/max4.mp3","Les débats de Gérard · jingle 3/3"],
+
 };
 
 // v1.6: embedded audio first, local MP3 paths remain as a backup.
@@ -725,13 +729,17 @@ function incrementRunCount(){
   return meta.runCount;
 }
 function currentRunCount(){return loadMeta().runCount||1;}
+function currentIntroJingleNumber(){return ((currentRunCount()-1)%3)+1;}
+function currentIntroJingleAudio(){return `JINGLE_GERARD_${currentIntroJingleNumber()}`;}
+function currentIntroJingleLabel(){return `JINGLE DES DÉBATS · VARIANTE ${currentIntroJingleNumber()}/3`;}
 function currentManuIntroAudio(){return "TEAM06";}
 function currentManuIntroLine(){return "Oui, vous êtes sur Fun.";}
 function currentManuIntroLabel(){return "▶ ÉCOUTER MANU : « OUI, VOUS ÊTES SUR FUN »";}
 function resetState(){
-  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17","devenirHabituel_euro_v18","devenirHabituel_euro_v19"].forEach(k=>localStorage.removeItem(k));
+  ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17","devenirHabituel_euro_v18","devenirHabituel_euro_v19","devenirHabituel_euro_v21","devenirHabituel_euro_v22","devenirHabituel_euro_v23","devenirHabituel_euro_v24","devenirHabituel_euro_v25","devenirHabituel_euro_v26"].forEach(k=>localStorage.removeItem(k));
   incrementRunCount();
-  state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast(`Progression remise à zéro. Piste Manu n°${currentRunCount()%2===1?1:2} pour cette partie.`);
+  introArchivePlayed=false;
+  state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast(`Nouvelle partie · jingle ${currentIntroJingleNumber()}/3.`);
 }
 function setScene(scene, checkpoint){state.scene=scene;if(checkpoint)state.checkpoint=checkpoint;save();render();}
 function clamp(){state.standard=Math.max(0,Math.min(100,state.standard));state.fun=Math.max(0,Math.min(100,state.fun));state.reputation=Math.max(0,Math.min(100,state.reputation));state.gege=Math.max(0,Math.min(100,state.gege));state.grille=Math.max(0,Math.min(100,state.grille));}
@@ -961,7 +969,7 @@ let introArchivePlayed=false;
 async function playIntroArchiveOnce(){
   if(introArchivePlayed||state.muted||state.scene!=="intro")return;
   introArchivePlayed=true;
-  try{await playSound("TEAM07",{wait:false});}
+  try{await playSound(currentIntroJingleAudio(),{wait:false});}
   catch(e){introArchivePlayed=false;}
 }
 window.addEventListener("pointerdown",()=>{if(state.scene==="intro"&&!introArchivePlayed)playIntroArchiveOnce();},{once:true});
@@ -969,7 +977,7 @@ window.addEventListener("pointerdown",()=>{if(state.scene==="intro"&&!introArchi
 function render(){stopAudio();updateHUD();updateVisual();const fn=scenes[state.scene]||scenes.intro;fn();decorateScene();}
 
 const scenes={
-  intro(){state.clock="23:56";save();updateHUD();updateVisual();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">ARCHIVE STANDARD · LANCEMENT AUTOMATIQUE</div><p class="muted">Si Chrome bloque le son à l'ouverture, le premier clic sur la page le déclenche automatiquement.</p>${btn("☎ APPELER LE STANDARD",async()=>{await playSfx("click");setScene("busy1","intro");})}</div>`;
+  intro(){state.clock="23:56";save();updateHUD();updateVisual();const jingleNo=currentIntroJingleNumber();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">${currentIntroJingleLabel()} · LANCEMENT AUTOMATIQUE</div><p class="muted">Les trois jingles authentiques des Débats de Gérard alternent d’une partie à l’autre. Si Chrome bloque le son à l’ouverture, le premier clic ou tap lance automatiquement la variante ${jingleNo}.</p>${btn("☎ APPELER LE STANDARD",async()=>{await playSfx("click");setScene("busy1","intro");})}</div>`;
     setTimeout(()=>playIntroArchiveOnce(),180);
   },
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
@@ -1039,6 +1047,6 @@ window.addEventListener("keydown",e=>{if(["A","B","C","D"].includes(e.key.toUppe
 render();
 
 </script>
-<!-- v2.5: TEAM07 moved to intro ambience. Exact "Bonsoir, tu veux parler de quoi ?" source identified in 20000831 debate, not falsely labelled in-game until exact clip is cut. -->
+<!-- v2.6: homepage alternates three authentic "Les débats de Gérard (Max)" jingles from SchooP: max6.mp3, max5.mp3, max4.mp3. Autoplay is attempted; first pointer interaction is the fallback when browser policy blocks audible autoplay. -->
 </body>
 </html>
