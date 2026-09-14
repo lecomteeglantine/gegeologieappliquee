@@ -491,7 +491,7 @@ body{
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
-      <span>DEVENIR UN HABITUEL <small class="version">v2.7</small></span>
+      <span>DEVENIR UN HABITUEL <small class="version">v2.8</small></span>
     </div>
     <div class="top-actions">
       <button id="soundToggle" class="icon-btn" type="button" aria-pressed="false" title="Couper le son">SON ◼</button>
@@ -637,14 +637,15 @@ const AUDIO = {
   TEAM02:["assets/audio/team/team02.mp3","Manu — c’est pas possible"],
   TEAM03:["assets/audio/team/team03.mp3","Phildar — faire gueuler le moustachu"],
   TEAM04:["assets/audio/team/team04.mp3","Manu — Oui, vous êtes sur Fun. Bonsoir Trevor."],
-  TEAM06:["assets/audio/team/team06.mp3","Manu — Oui, vous êtes sur Fun."],
+  TEAM06:["assets/audio/team/team06.mp3","Archive · débat sur l’affaire Lady Di · 02/11/2000 · voix non attribuée"],
   TEAM07:["assets/audio/team/team07.mp3","Manu — Variante 2 du standard"],
   TEAM05:["assets/audio/team/team05.mp3","Manu — On accueille, tu le reprends…"],
   EURO01:["assets/audio/euro/euro01_faux_serieux.mp3","Extrait authentique · débat sur l’euro · faux sérieux"],
   EURO02:["assets/audio/euro/euro02_montee_tension.mp3","Extrait authentique · débat sur l’euro · montée de tension"],
-  JINGLE_GERARD_1:["https://www.schoop.fr/sons/mp3/max6.mp3","Les débats de Gérard · jingle 1/3"],
+  // v2.8 — ordre demandé : partie 1=max4, partie 2=max5, partie 3=max6, puis boucle.
+  JINGLE_GERARD_1:["https://www.schoop.fr/sons/mp3/max4.mp3","Les débats de Gérard · jingle 1/3"],
   JINGLE_GERARD_2:["https://www.schoop.fr/sons/mp3/max5.mp3","Les débats de Gérard · jingle 2/3"],
-  JINGLE_GERARD_3:["https://www.schoop.fr/sons/mp3/max4.mp3","Les débats de Gérard · jingle 3/3"],
+  JINGLE_GERARD_3:["https://www.schoop.fr/sons/mp3/max6.mp3","Les débats de Gérard · jingle 3/3"],
 
 };
 
@@ -732,13 +733,11 @@ function currentRunCount(){return loadMeta().runCount||1;}
 function currentIntroJingleNumber(){return ((currentRunCount()-1)%3)+1;}
 function currentIntroJingleAudio(){return `JINGLE_GERARD_${currentIntroJingleNumber()}`;}
 function currentIntroJingleLabel(){return `JINGLE DES DÉBATS · VARIANTE ${currentIntroJingleNumber()}/3`;}
-function currentManuIntroAudio(){return "TEAM06";}
-function currentManuIntroLine(){return "Oui, vous êtes sur Fun.";}
-function currentManuIntroLabel(){return "▶ ÉCOUTER MANU : « OUI, VOUS ÊTES SUR FUN »";}
 function resetState(){
   ["devenirHabituel_euro_v1","devenirHabituel_euro_v12","devenirHabituel_euro_v13","devenirHabituel_euro_v14","devenirHabituel_euro_v15","devenirHabituel_euro_v16","devenirHabituel_euro_v17","devenirHabituel_euro_v18","devenirHabituel_euro_v19","devenirHabituel_euro_v21","devenirHabituel_euro_v22","devenirHabituel_euro_v23","devenirHabituel_euro_v24","devenirHabituel_euro_v25","devenirHabituel_euro_v26"].forEach(k=>localStorage.removeItem(k));
   incrementRunCount();
   introArchivePlayed=false;
+  introArchivePromise=null;
   state={...DEFAULT,reactions:{}};save();stopAudio();el.modal.classList.add("hidden");render();toast(`Nouvelle partie · jingle ${currentIntroJingleNumber()}/3.`);
 }
 function setScene(scene, checkpoint){state.scene=scene;if(checkpoint)state.checkpoint=checkpoint;save();render();}
@@ -797,7 +796,7 @@ function stopAudio(){
   if(activeAudio){try{activeAudio.pause();activeAudio.currentTime=0;}catch(e){} activeAudio=null;}
   el.wave.classList.remove("playing");
 }
-async function playSound(id,{wait=true,button=null}={}){
+async function playSound(id,{wait=true,button=null,silentFailure=false}={}){
   if(!AUDIO[id])return false;
   if(state.muted){toast("Le son est coupé : appuie sur SON : OFF pour le réactiver.");return false;}
   stopAudio();
@@ -815,8 +814,10 @@ async function playSound(id,{wait=true,button=null}={}){
   }catch(err){
     el.wave.classList.remove("playing");
     if(button){button.classList.remove("is-playing");button.removeAttribute("aria-busy");}
-    showAudioFallback(id,button);
-    toast("Le navigateur refuse la lecture automatique : utilise le lecteur audio affiché juste dessous.");
+    if(!silentFailure){
+      showAudioFallback(id,button);
+      toast("La lecture audio a été bloquée par le navigateur.");
+    }
     return false;
   }
   if(!wait)return true;
@@ -887,7 +888,9 @@ function audioGate(id,label,next){
 }
 function visualMode(scene){
   if(["intro","busy1","busy2","callback"].includes(scene))return"bedroom";
-  if(["manu_intro","audition","wait"].includes(scene))return"standard";
+  // v2.8: on the pickup scene, show only the single embedded B&W telephone photo.
+  if(scene==="manu_intro")return"none";
+  if(["audition","wait"].includes(scene))return"standard";
   if(scene==="pseudo")return"pseudo";
   if(scene==="offair")return"offair";
   if(scene==="summary")return"summary";
@@ -897,6 +900,7 @@ function updateVisual(){
   const mode=visualMode(state.scene);
   el.visualLayer.className=`visual-layer visual-${mode}`;
   const wave=`<div class="wave-strip"><img src="assets/images/euro-waveform.png" alt=""></div>`;
+  if(mode==="none"){el.visualLayer.innerHTML="";return;}
   if(mode==="bedroom") el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="assets/images/bedroom.svg" alt=""><div class="visual-caption">CHAMBRE · 1999</div><div class="info-pill">APPEL À LA MAISON</div></div>`;
   else if(mode==="standard") el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="assets/images/standard.svg" alt=""><div class="visual-caption green">STANDARD · LIGNES AUDITEURS</div><div class="info-pill">MANU FILTRE LES APPELS</div></div>`;
   else if(mode==="pseudo") el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="assets/images/standard.svg" alt="">${wave}<div class="visual-caption">CAHIER DU STANDARD</div><div class="info-pill">TROUVE TON PSEUDO</div></div>`;
@@ -964,28 +968,45 @@ function gerbe({reason="Le standard a coupé ta ligne.",resume="intro",hard=fals
 }
 
 let introArchivePlayed=false;
-async function playIntroArchiveOnce(){
-  if(introArchivePlayed||state.muted||state.scene!=="intro")return;
-  introArchivePlayed=true;
-  try{
-    await playSound(currentIntroJingleAudio(),{wait:true});
-    if(state.scene==="intro"&&!state.muted){
-      await sleep(120);
-      await playSound("TEAM06",{wait:false});
+let introArchivePromise=null;
+async function playIntroArchiveOnce({wait=false,silentFailure=false}={}){
+  if(state.muted||state.scene!=="intro")return false;
+  if(introArchivePlayed)return true;
+  if(introArchivePromise)return introArchivePromise;
+  introArchivePromise=(async()=>{
+    try{
+      const ok=await playSound(currentIntroJingleAudio(),{wait,silentFailure});
+      if(ok)introArchivePlayed=true;
+      return !!ok;
+    }catch(e){
+      return false;
+    }finally{
+      introArchivePromise=null;
     }
-  }catch(e){introArchivePlayed=false;}
+  })();
+  return introArchivePromise;
 }
-window.addEventListener("pointerdown",()=>{if(state.scene==="intro"&&!introArchivePlayed)playIntroArchiveOnce();},{once:true});
+// Autoplay is attempted by scenes.intro(). If a browser blocks it, the first user
+// gesture anywhere retries. The main CTA handles its own gesture so the jingle
+// can finish before the scene changes.
+window.addEventListener("pointerdown",(event)=>{
+  if(state.scene!=="intro"||introArchivePlayed||state.muted)return;
+  if(event.target.closest(".btn"))return;
+  playIntroArchiveOnce({wait:false});
+},{passive:true});
+window.addEventListener("keydown",()=>{
+  if(state.scene==="intro"&&!introArchivePlayed&&!state.muted)playIntroArchiveOnce({wait:false});
+});
 
 function render(){stopAudio();updateHUD();updateVisual();const fn=scenes[state.scene]||scenes.intro;fn();decorateScene();}
 
 const scenes={
-  intro(){state.clock="23:56";save();updateHUD();updateVisual();const jingleNo=currentIntroJingleNumber();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">${currentIntroJingleLabel()} · LANCEMENT AUTOMATIQUE</div><p class="muted">Les trois jingles authentiques des Débats de Gérard alternent d’une partie à l’autre. Le petit extrait de standard précédent est maintenant utilisé uniquement ici, après le jingle. Si Chrome bloque le son à l’ouverture, le premier clic ou tap lance la séquence.</p>${btn("☎ APPELER LE STANDARD",async()=>{await playSfx("click");setScene("busy1","intro");})}</div>`;
-    setTimeout(()=>playIntroArchiveOnce(),180);
+  intro(){state.clock="23:56";save();updateHUD();updateVisual();const jingleNo=currentIntroJingleNumber();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">JEUDI · 1999</div><h1>23:56</h1><p class="big">Tu les écoutes depuis des mois.</p><p>Ce soir, tu vas appeler.</p><div class="sound-badge">${currentIntroJingleLabel()} · LANCEMENT AUTOMATIQUE</div><p class="muted">Les trois jingles authentiques des Débats de Gérard alternent d’une partie à l’autre. Si le navigateur bloque le son à l’ouverture, le premier clic ou tap sur la page le déclenche.</p>${btn("☎ APPELER LE STANDARD",async()=>{if(!introArchivePlayed&&!state.muted)await playIntroArchiveOnce({wait:true});await playSfx("click");setScene("busy1","intro");})}</div>`;
+    setTimeout(()=>playIntroArchiveOnce({wait:false,silentFailure:true}),180);
   },
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   busy2(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 02</div><h2>Toujours occupé.</h2><p class="muted">Tu raccroches. Tu recomposes.</p>${btn("RAPPELER",async()=>{await playSfx("ring");await playSfx("click");setScene("manu_intro");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
-  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><div class="sound-badge">STANDARD · ARCHIVE À VERROUILLER</div><h2>Le standard te prend sur la ligne.</h2><p class="muted">Le mauvais extrait a été retiré de cette scène. Le passage authentique recherché est celui où l’on entend : <strong>« Bonsoir, tu veux parler de quoi ? »</strong></p>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
+  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><h2>Le standard te prend sur la ligne.</h2>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
     bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
   },
   audition(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">AUDITION DU STANDARD</div>${dialogue("MANU","Pourquoi je te passe ?","manu")}<div class="choices">${choice("A","Parce que Gérard est nul.")}${choice("B","J’ai vraiment un avis sur l’euro.")}${choice("C","Je voulais savoir si les billets de Monopoly allaient aussi passer à l’euro.")}${choice("D","Passe-moi et tu verras.")}</div></div>`;
@@ -1056,12 +1077,22 @@ render();
 .scene-photo-hero-v24{height:420px!important;background:#111!important}
 .scene-photo-hero-v24 img{object-fit:contain!important;object-position:center center!important;background:#111!important}
 .scene-photo-secondary-v24{display:none!important}
+.visual-none{display:none!important}
 @media(max-width:760px){.scene-media-v24{max-width:100%}.scene-photo-hero-v24{height:330px!important}}
 @media(max-width:430px){.scene-photo-hero-v24{height:270px!important}}
 </style>
 </body>
 </html>
 
-<!-- v2.7: standard scenes intentionally use a single B&W Manu telephone archive photo. -->
+<!-- v2.8: "LE STANDARD DÉCROCHE" intentionally uses one embedded B&W telephone archive photo only. -->
 
-<!-- SOURCE NOTE v2.7: the exact phrase “Bonsoir, tu veux parler de quoi ?” is documented in the 31 Aug 2000 Routiers/CB debate. The surrounding transcript explicitly says Fildar is the person speaking to the caller at the standard; therefore this phrase is NOT labelled as Manu until a genuinely matching Manu clip is found. -->
+<!-- SOURCE NOTE v2.8:
+The line “Allô, bonsoir, tu veux parler de quoi ?” is transcribed in “Le débat sur les stations”
+and attributed there to Patrick, who is explicitly described as playing a libre-antenne standardiste.
+Archive catalogues list the source file as 19980205_Debat_sur_les_stations.mp3 (05/02/1998);
+the detailed Wikibooks transcript dates the same “stations” debate to 29/01/1998, so the date
+metadata is kept explicitly qualified rather than silently reconciled.
+No claim is made that this voice is Manu or Phildar. The older TEAM06 clip is not used on the
+intro page or on the pickup scene in this build. A guessed timestamp/audio cut is deliberately
+not embedded: the source MP3 must first be retrieved and the exact words verified by ear.
+-->
