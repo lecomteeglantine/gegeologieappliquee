@@ -491,7 +491,7 @@ body{
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
-      <span>DEVENIR UN HABITUEL <small class="version">v2.9</small></span>
+      <span>DEVENIR UN HABITUEL <small class="version">v2.10</small></span>
     </div>
     <div class="top-actions">
       <button id="soundToggle" class="icon-btn" type="button" aria-pressed="false" title="Couper le son">SON ◼</button>
@@ -636,13 +636,13 @@ const AUDIO = {
   TEAM01:["assets/audio/team/team01.mp3","Manu — OK"],
   TEAM02:["assets/audio/team/team02.mp3","Manu — c’est pas possible"],
   TEAM03:["assets/audio/team/team03.mp3","Phildar — faire gueuler le moustachu"],
-  TEAM04:["assets/audio/team/team04.mp3","Manu — Oui, vous êtes sur Fun. Bonsoir Trevor."],
+  TEAM04:["assets/audio/team/team04.mp3","Archive · débat sur l’affaire Lady Di · 02/11/2000 · non utilisée pour le décroché"],
   TEAM06:["assets/audio/team/team06.mp3","Archive · débat sur l’affaire Lady Di · 02/11/2000 · voix non attribuée"],
   TEAM07:["assets/audio/team/team07.mp3","Manu — Variante 2 du standard"],
   TEAM05:["assets/audio/team/team05.mp3","Manu — On accueille, tu le reprends…"],
   EURO01:["assets/audio/euro/euro01_faux_serieux.mp3","Extrait authentique · débat sur l’euro · faux sérieux"],
   EURO02:["assets/audio/euro/euro02_montee_tension.mp3","Extrait authentique · débat sur l’euro · montée de tension"],
-  // v2.9 — ordre demandé : partie 1=max4, partie 2=max5, partie 3=max6, puis boucle.
+  // v2.10 — ordre demandé : partie 1=max4, partie 2=max5, partie 3=max6, puis boucle.
   JINGLE_GERARD_1:["https://www.schoop.fr/sons/mp3/max4.mp3","Les débats de Gérard · jingle 1/3"],
   JINGLE_GERARD_2:["https://www.schoop.fr/sons/mp3/max5.mp3","Les débats de Gérard · jingle 2/3"],
   JINGLE_GERARD_3:["https://www.schoop.fr/sons/mp3/max6.mp3","Les débats de Gérard · jingle 3/3"],
@@ -888,7 +888,7 @@ function audioGate(id,label,next){
 }
 function visualMode(scene){
   if(["intro","busy1","busy2","callback"].includes(scene))return"bedroom";
-  // v2.9: on the pickup scene, show only the single embedded B&W telephone photo.
+  // v2.10: on the pickup scene, show only the single embedded B&W telephone photo.
   if(scene==="manu_intro")return"none";
   if(["audition","wait"].includes(scene))return"standard";
   if(scene==="pseudo")return"pseudo";
@@ -1006,7 +1006,7 @@ const scenes={
   },
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   busy2(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 02</div><h2>Toujours occupé.</h2><p class="muted">Tu raccroches. Tu recomposes.</p>${btn("RAPPELER",async()=>{await playSfx("ring");await playSfx("click");setScene("manu_intro");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
-  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><h2>Le standard te prend sur la ligne.</h2><div class="sound-badge">MANU, STANDARD DE FUN · ARCHIVE AUTHENTIQUE · 02/11/2000</div>${audioChip("TEAM04","ÉCOUTER MANU AU STANDARD")}${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
+  manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><h2>Le standard te prend sur la ligne.</h2><div class="sound-badge">MANU, STANDARD DE FUN</div>${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
     bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
   },
   audition(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">AUDITION DU STANDARD</div>${dialogue("MANU","Pourquoi je te passe ?","manu")}<div class="choices">${choice("A","Parce que Gérard est nul.")}${choice("B","J’ai vraiment un avis sur l’euro.")}${choice("C","Je voulais savoir si les billets de Monopoly allaient aussi passer à l’euro.")}${choice("D","Passe-moi et tu verras.")}</div></div>`;
@@ -1084,14 +1084,13 @@ render();
 </body>
 </html>
 
-<!-- v2.9: "LE STANDARD DÉCROCHE" uses one embedded B&W telephone photo only. -->
+<!-- v2.10: "LE STANDARD DÉCROCHE" uses one embedded B&W telephone photo only. -->
 
-<!-- SOURCE NOTE v2.9:
-The pickup-scene audio is TEAM04, an embedded 9.27 s MP3 extract tagged from
-[88] - [02/11/2000] - Debat sur l'affaire lady di (Gérard de Suresnes; www.mistercouzin.net).
-The corresponding transcript explicitly assigns Manu to the standard for the two-hour show and
-contains the exchange "Am I on radio ?" / "Oui vous êtes sur Fun" / "Bonsoir Trevor".
-The full archived episode is also catalogued as 20001102_Debat_sur_l_affaire_lady_di.mp3.
-No claim is made that TEAM06 is Manu; TEAM06 is not used for the pickup scene.
-The older disputed "Bonsoir, tu veux parler de quoi ?" wording is not displayed or used here.
+<!-- SOURCE NOTE v2.10:
+TEAM04 (Lady Di, 02/11/2000) is deliberately NOT used in the pickup scene: it was not a verified clean pickup by Manu.
+Verified target source for a future embedded pickup clip: 19980108_Debat_sur_l_informatique.mp3.
+The transcript explicitly places Manu and Ringo at the standard and attributes to Manu the line:
+"Oui bien sûr, tu es au standard, je t’écoute."
+The disputed wording "Oui Fun bonsoir, t'es au standard ! Tu veux parler de quoi ?" is documented elsewhere as Goldo imitating a standardist, so it must not be attributed to Manu.
+No unverified quote is displayed or played in the pickup scene.
 -->
