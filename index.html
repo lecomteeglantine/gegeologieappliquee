@@ -491,7 +491,7 @@ body{
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
-      <span>DEVENIR UN HABITUEL <small class="version">v2.14</small></span>
+      <span>DEVENIR UN HABITUEL <small class="version">v2.15</small></span>
     </div>
     <div class="top-actions">
       <button id="soundToggle" class="icon-btn" type="button" aria-pressed="false" title="Couper le son">SON ◼</button>
@@ -644,7 +644,7 @@ const AUDIO = {
   TEAM05:["assets/audio/team/team05.mp3","Insert Manu — On accueille, tu le reprends… · NON utilisé comme décroché"],
   EURO01:["assets/audio/euro/euro01_faux_serieux.mp3","Extrait authentique · débat sur l’euro · faux sérieux"],
   EURO02:["assets/audio/euro/euro02_montee_tension.mp3","Extrait authentique · débat sur l’euro · montée de tension"],
-  // v2.14 — ordre demandé : partie 1=max4, partie 2=max5, partie 3=max6, puis boucle.
+  // v2.15 — ordre demandé : partie 1=max4, partie 2=max5, partie 3=max6, puis boucle.
   JINGLE_GERARD_1:["https://www.schoop.fr/sons/mp3/max4.mp3","Les débats de Gérard · jingle 1/3"],
   JINGLE_GERARD_2:["https://www.schoop.fr/sons/mp3/max5.mp3","Les débats de Gérard · jingle 2/3"],
   JINGLE_GERARD_3:["https://www.schoop.fr/sons/mp3/max6.mp3","Les débats de Gérard · jingle 3/3"],
@@ -1000,6 +1000,34 @@ window.addEventListener("keydown",()=>{
   if(state.scene==="intro"&&!introArchivePlayed&&!state.muted)playIntroArchiveOnce({wait:false});
 });
 
+// v2.15: Manu's verified standard clip starts automatically when the standard scene opens.
+// If a browser blocks autoplay, the first gesture on that scene retries automatically.
+let manuIntroAutoplayPending=false;
+async function playManuIntroAutomatically(){
+  if(state.muted||state.scene!=="manu_intro"){
+    manuIntroAutoplayPending=false;
+    return false;
+  }
+  const button=el.screen.querySelector('[data-audio="MANU_STANDARD_DEPANNAGE_1998"]');
+  const ok=await playSound("MANU_STANDARD_DEPANNAGE_1998",{wait:false,button,silentFailure:true});
+  manuIntroAutoplayPending=!ok&&state.scene==="manu_intro"&&!state.muted;
+  return ok;
+}
+window.addEventListener("pointerdown",(event)=>{
+  if(!manuIntroAutoplayPending)return;
+  if(state.scene!=="manu_intro"||state.muted){manuIntroAutoplayPending=false;return;}
+  // The replay button has its own click handler; avoid starting the same clip twice.
+  if(event.target.closest('[data-audio="MANU_STANDARD_DEPANNAGE_1998"]')){manuIntroAutoplayPending=false;return;}
+  manuIntroAutoplayPending=false;
+  playManuIntroAutomatically();
+},{passive:true});
+window.addEventListener("keydown",()=>{
+  if(manuIntroAutoplayPending&&state.scene==="manu_intro"&&!state.muted){
+    manuIntroAutoplayPending=false;
+    playManuIntroAutomatically();
+  }
+});
+
 function render(){stopAudio();updateHUD();updateVisual();const fn=scenes[state.scene]||scenes.intro;fn();decorateScene();}
 
 const scenes={
@@ -1009,7 +1037,8 @@ const scenes={
   busy1(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 01</div><h2>Occupé.</h2><p class="muted">La ligne est déjà prise.</p>${btn("RAPPELER",async()=>{await playSfx("click");setScene("busy2");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   busy2(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker amber">APPEL 02</div><h2>Toujours occupé.</h2><p class="muted">Tu raccroches. Tu recomposes.</p>${btn("RAPPELER",async()=>{await playSfx("ring");await playSfx("click");setScene("manu_intro");})}</div>`;setTimeout(()=>playSfx("busy"),80);},
   manu_intro(){state.clock="23:58";save();updateHUD();el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">LE STANDARD DÉCROCHE</div><h2>Le standard te prend sur la ligne.</h2><div class="sound-badge">MANU, STANDARD DE FUN</div>${audioChip("MANU_STANDARD_DEPANNAGE_1998","ÉCOUTER MANU AU STANDARD")}${dialogue("LE STANDARD","Il faut maintenant lui donner une raison de te passer à l’antenne.","manu")}<div class="choices">${choice("A","Passe-moi Gérard. Je veux lui dire que c’est un con.")}${choice("B","Je voudrais participer au débat sur l’euro.")}${choice("C","Je voulais demander si un euro français vaudra autant qu’un euro étranger.")}${choice("D","J’ai une vanne de malade.")}</div></div>`;
-    bindChoices({A:async()=>{apply({standard:-5});await playSound("TEAM02");gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
+    bindChoices({A:async()=>{apply({standard:-5});gerbe({reason:"Tu n’as même pas atteint l’antenne.",resume:"manu_intro"});},B:()=>{apply({standard:2});setScene("audition");},C:async()=>{apply({standard:10,fun:4});await playSound("TEAM01");toast("Le standard accroche à ton idée.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-4});await playSound("TEAM02");setScene("audition");}});
+    playManuIntroAutomatically();
   },
   audition(){el.screen.innerHTML=`<div class="scene"><div class="scene-kicker">AUDITION DU STANDARD</div>${dialogue("MANU","Pourquoi je te passe ?","manu")}<div class="choices">${choice("A","Parce que Gérard est nul.")}${choice("B","J’ai vraiment un avis sur l’euro.")}${choice("C","Je voulais savoir si les billets de Monopoly allaient aussi passer à l’euro.")}${choice("D","Passe-moi et tu verras.")}</div></div>`;
     bindChoices({A:async()=>{apply({standard:-7});await playSound("TEAM02");gerbe({reason:"Le standard cherchait quelqu’un capable de jouer, pas seulement d’insulter.",resume:"manu_intro"});},B:()=>{apply({standard:3,fun:-1});setScene("pseudo","pseudo");},C:async()=>{apply({standard:10,fun:7});await playSound("TEAM01");toast("Le standard a relancé la ligne.");setScene("pseudo","pseudo");},D:async()=>{apply({standard:-3});if(state.standard<25){await playSound("TEAM02");gerbe({reason:"Tu as joué au mystérieux un peu trop tôt.",resume:"manu_intro"});}else setScene("pseudo","pseudo");}});
@@ -1071,7 +1100,7 @@ window.addEventListener("keydown",e=>{if(["A","B","C","D"].includes(e.key.toUppe
 render();
 
 </script>
-<!-- v2.14: homepage alternates the three requested Gérard jingles in order max4.mp3, max5.mp3, max6.mp3; autoplay is attempted and the first pointer interaction is the fallback when audible autoplay is blocked. -->
+<!-- v2.15: homepage alternates the three requested Gérard jingles in order max4.mp3, max5.mp3, max6.mp3; autoplay is attempted and the first pointer interaction is the fallback when audible autoplay is blocked. -->
 
 <style>
 /* v2.7: single archive photo on standard screens; no duplicate portrait card */
@@ -1083,13 +1112,13 @@ render();
 @media(max-width:760px){.scene-media-v24{max-width:100%}.scene-photo-hero-v24{height:330px!important}}
 @media(max-width:430px){.scene-photo-hero-v24{height:270px!important}}
 </style>
-<!-- v2.14: exact user-supplied Dépannage 1998 standard excerpt embedded directly in the single-file HTML. -->
+<!-- v2.15: exact user-supplied Dépannage 1998 standard excerpt embedded directly in the single-file HTML. -->
 </body>
 </html>
 
-<!-- v2.14: "LE STANDARD DÉCROCHE" uses one embedded B&W telephone photo and the exact user-supplied Dépannage 1998 standard excerpt. -->
+<!-- v2.15: "LE STANDARD DÉCROCHE" uses one embedded B&W telephone photo and the exact user-supplied Dépannage 1998 standard excerpt. -->
 
-<!-- SOURCE NOTE v2.14:
+<!-- SOURCE NOTE v2.15:
 Embedded source: user-supplied "Dépannage - 1998 - Débats de Gérard de Suresnes HD (mp3cut.net).mp3".
 This is the exact short clip selected by the user from the YouTube source for the standard pickup scene.
 The supplied clip is embedded byte-for-byte in index.html as MANU_STANDARD_DEPANNAGE_1998.
