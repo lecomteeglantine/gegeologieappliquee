@@ -510,7 +510,7 @@ body{
   <header class="topbar">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
-      <span>DEVENIR UN HABITUEL <small class="version">v2.17</small></span>
+      <span>DEVENIR UN HABITUEL <small class="version">v2.17.1</small></span>
     </div>
     <div class="top-actions">
       <button id="soundToggle" class="icon-btn" type="button" aria-pressed="false" title="Couper le son">SON ◼</button>
@@ -965,6 +965,11 @@ function updateVisual(){
   else if(mode==="offair") el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="${imageSrc("assets/images/offair.svg")}" alt="">${wave}<div class="visual-caption">PAUSE DISQUE</div><div class="info-pill">LE MICRO EST COUPÉ</div></div>`;
   else if(mode==="summary") el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="${imageSrc("assets/images/summary.svg")}" alt="">${wave}<div class="visual-caption green">BILAN DE LA NUIT</div><div class="info-pill">${esc(state.pseudo||"PSEUDO À CONFIRMER")}</div></div>`;
   else el.visualLayer.innerHTML=`<div class="art-stage"><img class="artwork" src="${imageSrc("assets/images/onair.svg")}" alt="">${wave}<div class="visual-caption red">STUDIO · DIRECT</div><div class="info-pill red">MASTER EURO · ARCHIVES AUTHENTIQUES</div></div>`;
+}
+
+function imageSrc(path){
+  const name=path.split('/').pop();
+  return (window.EMBEDDED_IMAGES&&window.EMBEDDED_IMAGES[name])||path;
 }
 
 function phoneChoiceLabel(choice){
